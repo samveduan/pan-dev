@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>部门管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+</head>
+
+<body>
+{% include "dist/head-user.html" %}
+    
+<!-- // left menu begin -->
+	<div class="main-left">
+    	<ul class="main-left-menu">
+    	      <li><a href="/kscd/general-storage/" target="_self"><span class="fa fa-user" aria-hidden="true"></span> &nbsp;个人空间</a></li>
+<!--               <li><a href="/kscd/secret-storage/" target="_self" class="main-left-menu-active"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> 私密空间</a></li> -->
+              <li><a href="/kscd/external-link/" target="_self"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 我的外链</a></li>
+              <li><a href="/kscd/myshare/" target="_self"><span class="fa fa-users" aria-hidden="true"></span> 我的共享</a></li>
+              <li><a href="/kscd/receive-share/" target="_self"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> 收到的共享</a></li>
+              <li><a href="/kscd/recycle/" target="_self"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 回收站</a></li>
+        </ul>
+        
+		{% include "dist/capacity-user.html" %}
+        
+    </div>
+<!-- // left menu  end -->
+
+<!-- //right begin -->
+	<div class="main-right">
+      <div class="main-right-in">
+      
+<!-- // ===============================================内容开始====================================================== -->
+
+<div class="botton-panel" id="file-table-toolbar">
+        	<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="upload-file-button">
+            	<i class="glyphicon glyphicon-open"></i>
+            	<span>上传文件</span>
+            </a>
+            
+            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="new-folder-button">
+            	<i class="glyphicon glyphicon-folder-open"></i>
+            	<span> 新建文件夹</span>
+            </a>
+            
+            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="download-button">
+            	<i class="glyphicon glyphicon-download-alt"></i>
+            	<span>下载</span>
+            </a>
+            
+            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="delete-button">
+            	<i class="glyphicon glyphicon-minus"></i>
+            	<span>删除</span>
+            </a>
+            
+            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="rename-button">
+            	<i class="glyphicon glyphicon-pencil"></i>
+            	<span>重命名</span>
+            </a>
+            
+              <div class="btn-group" role="group" id="move-to-button" style="display: none;">
+			    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			      	移动到
+			      <span class="caret"></span>
+			    </button>
+			    <ul class="dropdown-menu">
+			      <li><a href="#" id="move-to-space-button" id="move-to-space-button">个人空间</a></li>
+			      <li><a href="#" id="move-to-private-button" id="move-to-private-button">私密空间</a></li>
+			    </ul>
+			  </div>
+			  
+			  <div class="btn-group" role="group" id="copy-to-button" style="display: none;">
+			    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			      	复制到
+			      <span class="caret"></span>
+			    </button>
+			    <ul class="dropdown-menu">
+			      <li><a href="#" id="copy-to-space-button" id="copy-to-space-button">个人空间</a></li>
+			      <li><a href="#" id="copy-to-private-button" id="copy-to-private-button">私密空间</a></li>
+			    </ul>
+			  </div>
+</div>
+	    	
+<!-- //大表格区域 begin -->
+<table id="file-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+
+</table>
+<!-- //大表格区域 end -->
+
+<!-- // ===============================================内容结束====================================================== -->
+
+      </div>
+    </div>
+<!-- // right end -->
+
+<!-- //all modal begin -->
+
+<div class="modal fade" id="deptModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							×
+						</button>
+						<h4 id="headDeptLable" class="modal-title"> 编辑部门 </h4>
+						<input type="hidden" name="otype" id="otype" value="add">
+						<input type="hidden" name="addPdid" id="addPdid" value="">
+					</div>
+					<form id="defaultForm" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" name="username" placeholder="" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal">上级部门：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" name="fullname" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal">存储服务器：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <select name="storageServer" class="form-control">
+                                        <option value="AU">服务器一</option>
+                                        <option value="CA">服务器二</option>
+                                        <option value="FR">服务器三</option>
+                                        <option value="DE">服务器四</option>
+                                        <option value="IT">服务器五</option>
+                                        <option value="JP">服务器六</option>
+                                        <option value="GB">服务器七</option>
+                                        <option value="US">服务器八</option>
+                                        <option value="VN">服务器九</option>
+                                    </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal">排序：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" name="sort" />
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary"  id="subBtnUpDept" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" >
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<div class="modal fade" id="move-to-space-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">移动到个人空间</h4>
+			</div>
+			<form id="move-to-space-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+						<ul id="move-to-space-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+						<button class="btn btn-success" id="add-user-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal">
+							取 消
+						</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<div class="modal fade" id="move-to-private-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">移动到私密空间</h4>
+			</div>
+			<form id="move-to-private-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+						<ul id="move-to-private-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+						<button class="btn btn-success" id="" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal">
+							取 消
+						</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<div class="modal fade" id="copy-to-space-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">复制到个人空间</h4>
+			</div>
+			<form id="copy-to-space-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+						<ul id="copy-to-space-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+						<button class="btn btn-success" id="add-user-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal">
+							取 消
+						</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- //复制到私密空间 -->
+<div class="modal fade" id="copy-to-private-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">复制到私密空间</h4>
+			</div>
+			<form id="copy-to-private-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+						<ul id="copy-to-private-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+						<button class="btn btn-success" id="add-user-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal">
+							取 消
+						</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+<!-- //all modal end -->
+
+<script>
+$(function(){
+	var $fileTable = $('#file-table').bootstrapTable('destroy').bootstrapTable({
+	    url: 'data/' + 'space' + '.json',
+	    method: 'POST',
+	    uniqueId: 'id',                        
+	    striped: false,                         
+	    cache: false, 
+	    sortable: true,
+	    sortOrder: "asc",
+	    sidePagination: "client",
+	    undefinedText: '--',
+	    //singleSelect: true,
+	    //showRefresh   : true,
+	    //showColumns   : true,
+	    toolbar: '#file-table-toolbar',
+	    search: true,
+	    strictSearch: true,
+	    clickToSelect: true,
+	    pagination: true,
+	    pageNumber:1,
+	    pageSize: 10,
+	    pageList: [5, 10, 20, 50, 100],
+	    paginationPreText:"上一页",
+	    paginationNextText:"下一页",
+	    paginationLoop:false,
+	    //showToggle: true,
+	    //cardView: false,
+	    //detailView: false,
+	    //showPaginationSwitch: true,
+	    queryParams : function (params) {
+	        //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+	        var temp = {
+	            rows: params.limit,                         //页面大小
+	            page: (params.offset / params.limit) + 1,   //页码
+	            sort: params.sort,      //排序列名
+	            sortOrder: params.order //排位命令（desc，asc）
+	        };
+	        return temp;
+	    },
+	    columns: [
+	        {
+	        	checkbox: true
+	        },{
+		        field: 'filename',
+		        title:'名称',
+		        valign: 'middle',
+		        width: '16%',
+		        sortable: true
+	        },{
+		        field: 'size',
+		        title:'大小',
+		        width: '16%'
+	        },{
+		        field: 'status',
+		        title:'来自',
+		        width: '16%'
+	        },{
+		        field: 'status',
+		        title:'共享时间'
+	        }
+	    ],
+	    onLoadSuccess: function () {
+	        //alert('表格加载成功！');
+	    },
+	    onLoadError: function () {
+	        showTips("数据加载失败！");
+	    },
+	    onClickedRow: function (row, $element) {
+	        var id = row.ID;
+	        //EditViewById(id, 'view');
+	    },
+	    onCheck: function(row){
+		    var checkedExlink = $fileTable.bootstrapTable('getSelections');
+		    var len = checkedExlink.length;
+		    if(len == 1){
+		    	$("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+		    	if(checkedExlink[0].filetype == "dir"){
+		    		$("#copy-to-space-button").hide();
+		    	}
+		    }
+		    
+		    if(len > 1){
+		    	$("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+		    	$("#rename-button").hide();
+		    	for(var i = 0; i<len; i++){
+		    		if(checkedExlink[i].filetype == "dir"){
+		    			$("#copy-to-space-button").hide();
+		    			break;
+		    		}
+		    	}
+		    }
+	    },
+        onCheckAll: function(row){
+            var checkedExlink = $fileTable.bootstrapTable('getSelections');
+            var len = checkedExlink.length;
+            if(len == 1){
+                $("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+                if(checkedExlink[0].filetype == "dir"){
+                    $("#copy-to-space-button").hide();
+                }
+            }
+
+            if(len > 1){
+                $("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+                $("#rename-button").hide();
+                for(var i = 0; i<len; i++){
+                    if(checkedExlink[i].filetype == "dir"){
+                        $("#copy-to-space-button").hide();
+                        break;
+                    }
+                }
+            }
+		},
+	    onUncheck: function(row){
+		    var checkedExlink = $fileTable.bootstrapTable('getSelections');
+		    var len = checkedExlink.length;
+            if(len == 0){
+                $("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").hide();
+            }
+		    if(len == 1){
+		    	$("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+		    	if(checkedExlink[0].filetype == "dir"){
+		    		$("#copy-to-space-button").hide();
+		    	}
+		    }
+		    
+		    if(len > 1){
+		    	$("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").show();
+		    	$("#rename-button").hide();
+		    	for(var i = 0; i<len; i++){
+		    		if(checkedExlink[i].filetype == "dir"){
+		    			$("#copy-to-space-button").hide();
+		    			break;
+		    		}
+		    	}
+		    }
+	    },
+        onUncheckAll: function(row){
+            $("#create-exlinks-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-space-button").hide();
+		},
+	    rowStyle: function (row, index) { //设置行的特殊样式
+	        //这里有5个取值颜色['active', 'success', 'info', 'warning', 'danger'];
+	        var strclass = "";
+	        if (index == 1) {
+	            strclass = "warning";
+	            //console.log(row);
+	        }
+	        return { classes: strclass }
+	    }
+	});
+	
+	$("#download-button").click(function(){
+	    var checkedExlink = $fileTable.bootstrapTable('getSelections');
+	    var len = checkedExlink.length;
+	    
+	    if(len > 0){
+	    	
+	    }else{
+	    	toastr.error("请选择需要下载的文件或文件夹", "错误提示");
+	    }
+	});
+	
+	$("#delete-button").click(function(){
+	    var checkedExlink = $fileTable.bootstrapTable('getSelections');
+	    var len = checkedExlink.length;
+	    
+	    if(len > 0){
+	    	
+	    }else{
+	    	toastr.error("请选择需要删除的文件或文件夹", "错误提示");
+	    }
+	});
+	
+	/**
+	* 移动到个人空间
+	*/
+	var fileTreeSettingForMoveToSpace = {
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+		    callback: {
+		        onClick: function onClick(event, treeId, treeNode) {
+
+		     	}
+			}
+		};
+	
+	$("#move-to-space-button").click(function(){
+		$("#move-to-space-modal").modal("show");
+	    $.ajax({
+	        type: "GET",
+	        url: 'data/' + 'dir' + '.json',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	            $.fn.zTree.init($("#move-to-space-modal-tree"), fileTreeSettingForMoveToSpace, data);
+	        },
+	        error: function(data){
+	            console.log(data);
+	        }
+	    });
+	});
+	
+	/**
+	* 移动到私密空间
+	*/
+	var fileTreeSettingForMoveToPrivate = {
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+		    callback: {
+		        onClick: function onClick(event, treeId, treeNode) {
+
+		     	}
+			}
+	};
+	
+	$("#move-to-private-button").click(function(){
+		$("#move-to-private-modal").modal("show");
+	    $.ajax({
+	        type: "GET",
+	        url: 'data/' + 'dir' + '.json',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	            $.fn.zTree.init($("#move-to-private-modal-tree"), fileTreeSettingForMoveToPrivate, data);
+	        },
+	        error: function(data){
+	            console.log(data);
+	        }
+	    });
+	});
+	
+	/**
+	* 复制到个人空间
+	*/
+	var fileTreeSettingForCopyToSpace = {
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+		    callback: {
+		        onClick: function onClick(event, treeId, treeNode) {
+
+		     	}
+			}
+	};
+	
+	$("#copy-to-space-button").click(function(){
+		$("#copy-to-space-modal").modal("show");
+	    $.ajax({
+	        type: "GET",
+	        url: 'data/' + 'dir' + '.json',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	            $.fn.zTree.init($("#copy-to-space-modal-tree"), fileTreeSettingForCopyToSpace, data);
+	        },
+	        error: function(data){
+	            console.log(data);
+	        }
+	    });
+	});
+	
+	/**
+	* 复制到私密空间
+	*/
+	var fileTreeSettingForCopyToPrivate = {
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+		    callback: {
+		        onClick: function onClick(event, treeId, treeNode) {
+
+		     	}
+			}
+	};
+	
+	$("#copy-to-private-button").click(function(){
+		$("#copy-to-private-modal").modal("show");
+		
+	    $.ajax({
+	        type: "GET",
+	        url: 'data/' + 'dir' + '.json',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	            $.fn.zTree.init($("#copy-to-private-modal-tree"), fileTreeSettingForCopyToPrivate, data);
+	        },
+	        error: function(data){
+	            console.log(data);
+	        }
+	    });
+	    
+	});
+})
+</script>
+
+{% include "dist/footer.html" %}
+</body>
+</html>

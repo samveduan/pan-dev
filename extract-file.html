@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>提取文件</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+</head>
+
+<body class="narrow-page-bg">
+<!-- // body begin -->
+<div class="file-main">
+	<div class="file-main-logo">
+    	<img src="/static/img/logo2.png" /><span>麒麟信安云盘</span>
+    </div>
+
+    <div class="file-main-body">
+        <div class="file-main-body-above">
+            <div class="col-lg-6 col-md-6 col-sm-6" style="width:60px;margin-left:10px;margin-top:10px;">
+              <img src="/static/img/user.PNG" style="border-radius:65%;width:50px;">
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6" style="width:260px;margin-left:5px;margin-top:30px;color:#fff;">
+              <span> <b>{{username}}</b> 给您分享了文件</span> 
+            </div>
+        </div>
+        
+        <div class="file-main-body-below">
+	        <form id="get-file-form" method="post" class="form-horizontal" action="">
+	        	<input type="hidden" class="form-control" name="externalLinkId" id="external-link-id" value="{{external_link_id}}">
+		        <div class="file-main-body-below-extraction-code">请输入提取码：</div>
+		        <div class="file-main-body-below-input">
+		        	<input type="text" class="form-control" name="extractionCode" id="extraction-code" value="">
+		        </div>
+		        <div class="file-main-body-below-submit"><button class="btn btn-success" type="submit" id="get-file-submit">提取文件</button></div>
+		    </form>
+        <div>
+    </div>
+</div>
+<!-- body end // -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script>
+// var errorInfo = {{error_info}};
+
+$("#get-file-submit").click(function(e){
+	e.preventDefault();
+	var extractionCode = $("#extraction-code").val();
+	if(!extractionCode.match(/^[a-zA-Z0-9]{4}$/)){
+		toastr.error("请输入正确的提取码", "错误提示");
+		return;
+	}
+	var externalLinkId = $("#external-link-id").val();
+	var userName = "{{username}}";
+	var url = "/kscd/api/external-link/extract/" + externalLinkId + "/";
+	var params = JSON.stringify({"extract_code": extractionCode});
+	console.log("请求的url：");
+	console.log(url);
+	console.log("参数：");
+	console.log(params);
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log("提取文件时后台返回的数据：");
+        	console.log(data);
+        	if(data.ret){
+         		var exdays = 1;
+ 	       		var date = new Date();
+ 	       		date.setTime(date.getTime() + (exdays * 24 * 60 * 60 * 1000));
+ 	       		var expires = "expires=" + date.toGMTString();
+ 	       		document.cookie = "userName=" + userName + "; " + "file_id=" + data.external_link_file_info.file_id + "; " + expires;
+ 	       		console.log("cookie");
+ 	       		console.log(document.cookie);
+				var storage = window.localStorage;
+				storage.userName = userName;
+				storage.userId = data.external_link_file_info.user_id;
+				storage.fileId = data.external_link_file_info.file_id;
+    		    window.location.href = "/kscd/external-link/extract/";
+        	}else{
+        		toastr.error(data.msg,"错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败","错误提示");
+        }
+    });
+});
+</script>
+</body>
+</html>

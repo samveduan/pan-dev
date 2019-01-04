@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>收到的共享</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-user.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+	   <li><a href="/kscd/general-storage/" target="_self"><span class="fa fa-user" aria-hidden="true"></span> &nbsp;个人空间</a></li>
+<!--        <li><a href="/kscd/secret-storage/" target="_self"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> 私密空间</a></li> -->
+       <li><a href="/kscd/external-link/" target="_self"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 我的外链</a></li>
+       <li><a href="/kscd/myshare/" target="_self"><span class="fa fa-users" aria-hidden="true"></span> 我的共享</a></li>
+       <li><a href="/kscd/receive-share/" target="_self" class="main-left-menu-active"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> 收到的共享 <span class="badge" id="share-numbers"></span></a></li>
+       <li><a href="/kscd/recycle/" target="_self"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 回收站</a></li>
+    </ul>
+       
+	{% include "dist/capacity-user.html" %}
+       
+</div>
+<!-- left menu  end // -->
+
+<!-- //right begin -->
+<div class="main-right">
+      <div class="main-right-in">
+      
+			<!-- =============================================== // content begin ====================================================== -->
+			
+			<div class="bs-example bs-example-tabs" data-example-id="togglable-tabs">
+			    <ul id="myTabs" class="nav nav-tabs" role="tablist">
+			      <li role="presentation" class="active"><a href="#user-content" id="user-tab" role="tab" data-toggle="tab" aria-controls="home" aria-expanded="true">用户</a></li>
+			      <li role="presentation" class=""><a href="#share-group-content" role="tab" id="share-group-tab" data-toggle="tab" aria-controls="profile" aria-expanded="false">共享组</a></li>
+			      <li role="presentation" class=""><a href="#department-content" role="tab" id="department-tab" data-toggle="tab" aria-controls="profile" aria-expanded="false">部门</a></li>
+			    </ul>
+			    
+			    <div id="myTabContent" class="tab-content">
+			      <div role="tabpanel" class="tab-pane fade active in" id="user-content" aria-labelledby="user-tab">
+					<!-- // tab1 begin -->
+						<div class="botton-panel" id="user-table-toolbar">
+				            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="download-user-button">
+				            	<i class="glyphicon glyphicon-download-alt"></i>
+				            	<span>下载</span>
+				            </a>
+						</div>
+						
+						<table id="user-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+						
+						</table>
+					<!-- tab1 end // -->
+			      </div>
+			      
+			      <div role="tabpanel" class="tab-pane fade" id="share-group-content" aria-labelledby="share-group-tab">
+					<!-- // tab2 begin -->
+						<div class="botton-panel" id="share-group-table-toolbar">
+				            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="download-share-group-button">
+				            	<i class="glyphicon glyphicon-download-alt"></i>
+				            	<span>下载</span>
+				            </a>
+						</div>
+						
+						<table id="share-group-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+						
+						</table>
+					<!-- tab2 end // -->
+			      </div>
+			      
+			      <div role="tabpanel" class="tab-pane fade" id="department-content" aria-labelledby="department-tab">
+					<!-- // tab3 begin -->
+						<div class="botton-panel" id="department-table-toolbar">            
+				            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="download-department-button">
+				            	<i class="glyphicon glyphicon-download-alt"></i>
+				            	<span>下载</span>
+				            </a>
+						</div>
+						
+						<table id="department-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+						
+						</table>
+					<!-- tab3 end // -->
+			      </div>
+			    </div>
+			  </div>
+			<!-- =============================================== content end // ====================================================== -->
+
+      </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin ====================================================== -->
+{% include "dist/change-password.html" %}
+<!-- =============================================== all modal end // ====================================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 模块：来自用户的共享
+ */
+ 
+var $receiveUserTable = $('#user-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/receive-share/from-user/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#user-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+        };
+        console.log("获取来自用户共享列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'file_type',
+	        title:'类型',
+	        valign: 'middle',
+	        width: 50,
+	        formatter: fileTableType
+        },{
+	        field: 'file_name',
+	        title:'名称',
+	        valign: 'middle',
+	        width: '16%'
+        },{
+	        field: 'size',
+	        title:'大小',
+	        width: 160,
+	        formatter: fileTableSize
+        },{
+	        field: 'name',
+	        title:'来自'
+        },{
+	        field: 'share_time',
+	        title:'共享时间',
+	        width: 200
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击时的行信息");
+        console.log(row);
+    }
+});
+
+function fileTableType(value, row, index){
+   var result;
+   if(value == 0){
+	   result = '<img src="/static/img/opened_folder.png">'
+   }else{
+	   result = '<img src="/static/img/document.png">'
+   }
+   return result;
+}
+
+function fileTableSize(value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "--";
+   }else{
+      result = unitConversion(row.size);
+   }
+   return result;
+}
+ 
+$("#download-user-button").click(function(){
+	var checkedFile = $receiveUserTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len > 0){
+    	for(var i = 0; i<len; i++){    	
+	      	  if(Number(checkedFile[i].file_type) == 0){
+	    		  toastr.error("不能下载文件夹：" + checkedFile[i].file_name, "错误提示");
+	    	  }else{
+	     		  var iframe = document.createElement("iframe");
+	     		  iframe.style.display = "none"; // 防止影响页面
+	     		  iframe.style.height = 0; // 防止影响页面
+	     		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFile[i].file_id + '&user_id=' + checkedFile[i].owner_id; 
+	     		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+	     		  // 5分钟之后删除
+	     		  setTimeout(function(){
+	     		    iframe.remove();
+	     		  }, 5 * 60 * 1000);
+	    	  }
+      	}
+	}else if(len == 0){
+		toastr.error("请选择要下载的文件", "错误提示");
+	}
+});
+
+/**
+ * 模块：来自共享组的共享
+ */
+ 
+var $receiveGroupTable = $('#share-group-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/receive-share/from-group/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#share-group-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+        };
+        console.log("获取来自共享组列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'file_type',
+	        title:'类型',
+	        valign: 'middle',
+	        width: 50,
+	        formatter: fileTableType
+        },{
+	        field: 'file_name',
+	        title:'名称',
+	        valign: 'middle',
+	        width: '16%'
+        },{
+	        field: 'size',
+	        title:'大小',
+	        width: '16%',
+	        formatter: fileTableSize
+        },{
+	        field: 'name',
+	        title:'来自'
+        },{
+	        field: 'share_time',
+	        title:'共享时间',
+	        width: '16%'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+$("#download-share-group-button").click(function(){
+	var checkedFile = $receiveGroupTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len > 0){
+    	for(var i = 0; i<len; i++){
+	      	  if(Number(checkedFile[i].file_type) == 0){
+	    		  toastr.error("不能下载文件夹：" + checkedFile[i].file_name, "错误提示");
+	    	  }else{
+	       		  var iframe = document.createElement("iframe");
+	       		  iframe.style.display = "none"; // 防止影响页面
+	       		  iframe.style.height = 0; // 防止影响页面
+	       		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFile[i].file_id + '&user_id=' + checkedFile[i].owner_id; 
+	       		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+	       		  // 5分钟之后删除
+	       		  setTimeout(function(){
+	       		    iframe.remove();
+	       		  }, 5 * 60 * 1000);
+	    	  }
+    	}
+	}else if(len == 0){
+		toastr.error("请选择要下载的文件", "错误提示");
+	}
+});
+
+/**
+ * 模块：来自部门的共享
+ */
+ 
+var $receiveDepartmentTable = $('#department-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/receive-share/from-dept/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#department-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+        };
+        console.log("获取来自部门共享列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'file_type',
+	        title:'类型',
+	        valign: 'middle',
+	        width: 50,
+	        formatter: fileTableType
+        },{
+	        field: 'file_name',
+	        title:'名称',
+	        valign: 'middle',
+	        width: '16%',
+	        sortable: true
+        },{
+	        field: 'size',
+	        title:'大小',
+	        width: '16%',
+	        formatter: fileTableSize
+        },{
+	        field: 'name',
+	        title:'来自'
+        },{
+	        field: 'share_time',
+	        title:'共享时间',
+	        width: '16%'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+$("#download-department-button").click(function(){
+	var checkedFile = $receiveDepartmentTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len > 0){
+    	for(var i = 0; i<len; i++){
+	      	  if(Number(checkedFile[i].file_type) == 0){
+	    		  toastr.error("不能下载文件夹：" + checkedFile[i].file_name, "错误提示");
+	    	  }else{
+	     		  var iframe = document.createElement("iframe");
+	     		  iframe.style.display = "none"; // 防止影响页面
+	     		  iframe.style.height = 0; // 防止影响页面
+	     		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFile[i].file_id + '&user_id=' + checkedFile[i].owner_id; 
+	     		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+	     		  // 5分钟之后删除
+	     		  setTimeout(function(){
+	     		    iframe.remove();
+	     		  }, 5 * 60 * 1000);
+	    	  }
+      	}
+	}else if(len == 0){
+		toastr.error("请选择要下载的文件", "错误提示");
+	}
+});
+</script>
+
+{% include "dist/common.html" %}
+
+{% include "dist/common-user.html" %}
+</body>
+</html>

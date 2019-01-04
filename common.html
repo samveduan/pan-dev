@@ -1,0 +1,69 @@
+<script>
+/**
+ * 功能：动态显示获取到的系统时间
+ */
+(function(){
+	var serviceTime = document.getElementById("system-time");
+	
+	//解析当前时间
+	var systime = "{{system_time}}"; //"2018年04月28日 16:01:09";
+	console.log(systime);
+	serviceTime.innerHTML = "系统时间：" + systime;
+	systime = systime.replace('年', "/").replace('月', "/").replace('日', '');
+	systime = new Date(systime).getTime();
+	
+	setInterval(function(){
+		var time = new Date(systime);
+	    var year = time.getFullYear();
+	    var month = time.getMonth() + 1;
+	    var date = time.getDate();
+	    if (date >= 0 && date <= 9) {
+	    	date = "0" + date;
+	    }
+	    var hour = time.getHours();
+	    if (hour >= 0 && hour <= 9) {
+	    	hour = "0" + hour;
+	    }
+	    var minutes = time.getMinutes();
+	    if (minutes >= 0 && minutes <= 9) {
+	    	minutes = "0" + minutes;
+	    }
+	    var seconds= time.getSeconds();
+	    if (seconds >= 0 && seconds <= 9) {
+	    	seconds = "0" + seconds;
+	    }
+	    serviceTime.innerHTML = "系统时间：" + year + "年" + month + "月" + date + "日 " + hour + ":" + minutes + ":" + seconds;
+	    systime += 1000;
+	}, 1000);
+})();
+
+/**
+ * 文件大小单位转换(输入为B)
+ */
+function unitConversion(size){
+	if(size >= 1024 && size < (1024*1024)){
+		size = (size/1024).toFixed(2) + "K";
+	}else if(size >= (1024*1024) && size < (1024*1024*1024)){
+		size = (size/(1024*1024)).toFixed(2) + "M";
+	}else if(size >= (1024*1024*1024) && size < (1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024)).toFixed(2) + "G";
+	}else if(size >= (1024*1024*1024*1024) && size < (1024*1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024*1024)).toFixed(2) + "T";
+	}else{
+		size += "B";
+	}
+	return size;
+}
+
+/**
+ * 功能： 过滤掉文本框中输入的html、css、JavaScript及tab、空格、空行
+ */
+function filterHtml(html){
+	s = html.replace(/<\s*script[^>]*>(.|[\r\n])*?<\s*\/script[^>]*>/gi, ''); //定义script的正则表达式
+	s = s.replace(/<\s*style[^>]*>(.|[\r\n])*?<\s*\/style[^>]*>/gi, ''); //定义style的正则表达式
+	s = s.replace(/<\/?[^>]+>/gi, ''); //定义HTML标签的正则表达式 
+	s = s.replace(/\\s*|\t|\r|\n|<|>/gi, ''); //去除tab、空格、空行
+	s = s.replace(/ /gi, '');
+	return s;
+}
+</script>

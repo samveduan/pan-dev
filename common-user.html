@@ -1,0 +1,199 @@
+
+<script>
+/**
+ * 模块：修改密码
+ */
+$('#change-password-modal-form').bootstrapValidator({
+	message : '该值无效',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	fields : {
+		changePasswordModalOldPassword : {
+			message : '旧密码无效',
+			validators : {
+				notEmpty : {
+					message : '旧密码不能为空'
+				},
+				different: {
+		            field: 'changePasswordModalNewPassword',
+		            message: '新旧密码不能一致'
+		        }
+			}
+		},
+		changePasswordModalNewPassword : {
+			message : '新密码无效',
+			validators : {
+                notEmpty: {
+                    message: '密码不能为空'
+                },
+                regexp: {
+                    regexp: /^[a-zA-Z0-9_]{6,32}$/,
+                    message: '密码为6至32位字母、数字或者下划线'
+                },
+                different: {
+                    field: 'changePasswordModalOldPassword',
+                    message: '新旧密码不能一致'
+                },
+                identical: {
+                    field: 'changePasswordModalConfirmPassword',
+                    message: '新密码和确认密码不一致'
+                }
+			}
+		},
+		changePasswordModalConfirmPassword : {
+			message : '确认密码无效',
+			validators : {
+                notEmpty: {
+                    message: '确认密码不能为空'
+                },
+                regexp: {
+                    regexp: /^[a-zA-Z0-9_]{6,32}$/,
+                    message: '密码为6至32位字母、数字或者下划线'
+                },
+                identical: {
+                    field: 'changePasswordModalNewPassword',
+                    message: '新密码和确认密码不一致'
+                }
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	var oldPassword = $("#change-password-modal-old-password").val();
+    var newPassword = $("#change-password-modal-new-password").val();
+    $.ajax({
+        type: "GET",
+        url: '/kscd/api/user/pwd-token/',
+        data: JSON.stringify({}),
+        dataType: "json",
+        success: function(data){
+        	if(data.ret == true){
+				var tk = data.token;
+				var salt = 'kylinos';
+        		var key = hex_sha1(hex_sha1(hex_sha1(oldPassword)+salt)+tk);
+				// 阶段二 begin
+				$.ajax({
+					type: "POST",
+					url: '/kscd/api/user/change-passwd/',
+					data: JSON.stringify({new_password: newPassword, old_password: key}),
+					dataType: "json",
+					success: function(data){
+						if(data.ret == true){
+							toastr.success('修改密码成功', "正确提示");
+							$("#change-password-modal-form")[0].reset();
+							$("#change-password-modal-form").data('bootstrapValidator').resetForm();
+							$("#change-password-modal").modal("hide");
+						}else{
+							toastr.error(data.msg, "错误提示");
+						}
+					},
+					error: function(data){
+						toastr.error('连接错误', "错误提示");
+					}
+				});
+				// 阶段二 end
+        	}else{
+				toastr.error(data.msg, "错误提示");
+			}
+        },
+        error: function(data){
+            toastr.error('连接错误', "错误提示");
+        }
+    });
+});
+
+function clearPasswordValidate(formId){
+	$("#" + formId)[0].reset()
+    $("#" + formId).data('bootstrapValidator').resetForm();
+}
+
+/**
+ * 模块：获取容量
+ */
+function getStorageSize(){
+	$.ajax({
+	    type: "GET",
+	    url: '/kscd/api/general-storage/user-size/',
+	    data: {},
+	    dataType: "json",
+	    success: function(data){
+	    	console.log("获取到的网盘容量数据");
+	    	console.log(data);
+	        if(data.ret == true){
+				$("#space-capacity-used").text(unitConversion(Number(data.user_size_info.g_used_size)));
+				$("#space-capacity-total").text(unitConversion(Number(data.user_size_info.gquota)));
+				var percent = Number(data.user_size_info.g_used_size)/Number(data.user_size_info.gquota);
+				if(percent >= 60 && percent < 80){
+					$(".space-capacity-progress span").css({"width": percent + "%", "background": "#fdd000"});
+				}else if(percent >= 80 && percent <= 100){
+					$(".space-capacity-progress span").css({"width": percent + "%", "background": "#ff3527"});
+				}else{
+					$(".space-capacity-progress span").css({"width": percent + "%"});
+				}
+				
+				console.log(Number(data.user_size_info.g_used_size)/Number(data.user_size_info.total_size) + "%");
+	        }else{
+	        	toastr.error(data.err_msg, "错误提示");
+	        }
+	    },
+	    error: function(data){
+	    	toastr.error("连接失败", "错误提示");
+	    }
+	});
+}
+
+getStorageSize();
+
+/**
+ * 模块：获取用户名
+ */
+$.ajax({
+    type: "GET",
+    url: '/kscd/api/user/' + '{{user_id}}' + "/",
+    data: {},
+    dataType: "json",
+    success: function(data){
+    	console.log("获取到的用户名数据");
+    	console.log(data);
+        if(data.ret == true){
+        	document.getElementById("username").innerText = data.user.alias;
+        }else{
+        	toastr.error(data.err_msg, "错误提示");
+        }
+    },
+    error: function(data){
+    	toastr.error("获取用户名时连接失败", "错误提示");
+    }
+});
+
+/**
+ * 模块：提交用户登录状态
+ */
+function setUserStatus(){
+	$.ajax({
+	    type: "GET",
+	    url: '/kscd/api/user/set-user-online/',
+	    data: {},
+	    dataType: "json",
+	    success: function(data){
+	    	console.log("设置用户登录状态时获取到的数据");
+	    	console.log(data);
+	        if(data.ret != true){
+	        	toastr.error(data.err_msg, "错误提示");
+	        }
+	    },
+	    error: function(data){
+	    	toastr.error("获取用户名时连接失败", "错误提示");
+	    }
+	});
+}
+
+setUserStatus();
+
+setInterval(function(){
+	setUserStatus();
+}, 1000*60);
+</script>

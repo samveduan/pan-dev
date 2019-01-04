@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>用户管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+<style>
+.pull-left {
+  padding-left: 10px;
+}
+.pull-right {
+  padding-right: 10px;
+}
+</style>
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu  end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+   <div class="main-right-in">
+      
+      	<!-- =============================================== // content begin ====================================================== -->
+      
+		<!-- // main begin -->
+		<table class="table table-bordered">
+			  <tr>
+			    <td width="228" align="left" valign="top">
+			    
+			    	<!-- // left table begin -->
+			    	<ul id="department-tree" class="ztree"></ul>
+			    	<!-- // left table end -->
+			    	
+			    </td>
+			    
+			    <td align="left" valign="top" style="padding: 0;">
+				    <!-- // right table begin -->
+				    <div id="user-table-toolbar">
+				    	 <a class="btn btn-success btn-sm" style="text-decoration: none;" id="create-user-button">
+					     	<i class="glyphicon glyphicon-folder-open"></i>
+					     	<span>&nbsp;创建</span>
+						 </a>
+						
+						 <a class="btn btn-success btn-sm" style="text-decoration: none;" id="user-move-up-button">
+					     	<i class="glyphicon glyphicon-arrow-up"></i>
+					     	<span>上移</span>
+					     </a>
+					     
+					     <a class="btn btn-success btn-sm" style="text-decoration: none;" id="user-move-down-button">
+					     	<i class="glyphicon glyphicon-arrow-down"></i>
+					     	<span>下移</span>
+					     </a>
+					     
+				    	 <a class="btn btn-success btn-sm" style="text-decoration: none;" id="edit-user-button">
+					     	<i class="glyphicon glyphicon-pencil"></i>
+					     	<span>编辑</span>
+						 </a>
+						
+				    	 <a class="btn btn-success btn-sm" style="text-decoration: none;" onClick="deleteUser()">
+			    	      	<i class="glyphicon glyphicon-minus"></i>
+					     	<span>删除</span>
+				    	 </a>
+					</div>
+					
+					<table id="user-table" data-toggle="table" class="table table-striped">
+		
+					</table>
+				
+				<!-- right table end // -->
+			    </td>
+			  </tr>
+		</table>
+		<!-- main end // -->
+
+		<!-- =============================================== content end // ====================================================== -->
+
+   </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+
+<!-- // add user begin -->
+<div class="modal fade" id="add-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('add-user-modal-form');$('#add-user-modal-custom').hide();">
+							×
+						</button>
+						<h4 class="modal-title"> 创建用户 </h4>
+					</div>
+					<form id="add-user-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">账号：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-user-modal-user-name" name="addUserModalUserName" placeholder="" />
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <!--<div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="add-user-modal-usbkey" name="addUserModalUsbkey" /> 智能卡
+                                    </label>
+                                </div>-->
+                            </div>
+                        </div>
+                        
+                       <div class="form-group" id="add-user-modal-custom" name='addUserModalCustom' style="display: none">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">用户名定义：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                              	<label class="radio-inline">
+									<input type="radio" id="add-user-modal-user-sn" name="addUserModalIdType" value="sn">
+									使用SN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="add-user-modal-user-cn" name="addUserModalIdType" value="cn">
+									使用CN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="add-user-modal-user-custom" name="addUserModalIdType" value="custom" checked="checked">
+									自定义
+								</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">姓名：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-user-modal-name" name="addUserModalName" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">个人空间配额：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-user-modal-space" name="addUserModalSpace" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-1" style="padding-left: 0;">
+                                <div class="checkbox">G</div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">私密空间配额：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-user-modal-private" name="addUserModalPrivate" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-1" style="padding-left: 0;">
+                                <div class="checkbox">G</div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">权重：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <input type="text" class="form-control" id="add-user-modal-weight" name="addUserModalWeight"/>
+                            </div>
+                        </div>
+                        
+                        <input type="text" style="width: 0; height: 0;margin: 0; padding: 0; border: 0; position: absolute; left: 0; top: 0"/>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">密码：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6 ">
+                                <input type="password" class="form-control" id="add-user-modal-password" name="addUserModalPassword" autocomplete="new-password"/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+<!--                                 <div class="checkbox"> -->
+<!--                                     <label> -->
+<!--                                         <input type="checkbox" id="add-user-modal-default-password" name="addUserModalDefaultPassword"> 默认密码 -->
+<!--                                     </label> -->
+<!--                                 </div> -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">存储服务器：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <select id="add-user-modal-server" name="addUserModalServer" class="form-control">
+                                        <option value="1">服务器一</option>
+                                        <option value="2">服务器二</option>
+                                        <option value="3">服务器三</option>
+                                        <option value="4">服务器四</option>
+                                        <option value="5">服务器五</option>
+                                        <option value="6">服务器六</option>
+                                        <option value="7">服务器七</option>
+                                        <option value="8">服务器八</option>
+                                        <option value="9">服务器九</option>
+                                    </select>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="add-user-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('add-user-modal-form');$('#add-user-modal-custom').hide();">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- add user end // -->
+
+<!-- // edit user begin -->
+<div class="modal fade" id="edit-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('edit-user-modal-form');">
+							×
+						</button>
+						<h4 class="modal-title"> 编辑用户 </h4>
+					</div>
+					<form id="edit-user-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+                        
+                        <input type="hidden" class="form-control" id="edit-user-id" name="editUserId" placeholder="" value="adm1" disabled/>
+						 
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">账号：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-user-user-name" name="editUserUserName" placeholder="" value="adm1" disabled/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <div class="checkbox">
+                                
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">姓名：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-user-name" name="editUserName" value=""/>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">个人空间配额：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-user-space" name="editUserSpace" value="" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-1" style="padding-left: 0;">
+                                <div class="checkbox">G</div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">私密空间配额：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-user-private" name="editUserPrivate" value=""/>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-1" style="padding-left: 0;">
+                                <div class="checkbox">G</div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">权重：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <input type="text" id="edit-user-weight" name="editUserWeight" class="form-control"/>
+                            </div>
+                        </div>
+                        
+                        <input type="text" style="width: 0; height: 0;margin: 0; padding: 0; border: 0; position: absolute; left: 0; top: 0"/>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">密码：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="password" class="form-control" id="edit-user-password" name="editUserPassword" autocomplete="new-password"/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <!-- <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="" value="" name="editUserUseOldPassword" id="edit-user-use-old-password" checked/> 使用原密码
+                                    </label>
+                                </div> -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">存储服务器：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <select id="edit-user-server" name="editUserServer" class="form-control">
+                                    </select>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="edit-user-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('edit-user-modal-form');">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- edit user end // -->
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 模块：部门树
+ */
+
+//选择的部门id 
+var chosenDeptId = "";
+
+function initDeptId(){
+	var zTree = $.fn.zTree.getZTreeObj("department-tree");
+	var nodes = zTree.getNodes();
+	var allNodes = zTree.transformToArray(nodes);
+	chosenDeptId = allNodes[0].id;
+}
+
+//部门树配置
+var departmentTreeSetting = {
+	data: {		
+		simpleData: {			
+			enable: true		
+		}	
+	},    
+	callback: {
+		onClick: function(event, treeId, treeNode, clickFlag) {			    
+		    //获取当前节点
+            chosenDeptId = treeNode.id;
+			console.log("已选择部门的id");
+			console.log(chosenDeptId);
+            $userTable.bootstrapTable("refresh");
+		}
+	}
+};
+
+//初始化部门树
+(function(){
+    $.ajax({
+        type: "GET",
+        url: '/kscd/api/dept/',
+        data: {},
+        dataType: "json",
+        success: function(data){
+			console.log("获取部门树时后台返回的所有数据");
+            console.log(data);
+			if(data.ret){
+				$.fn.zTree.init($("#department-tree"), departmentTreeSetting, data.depts);
+				var treeObj = $.fn.zTree.getZTreeObj("department-tree");
+				treeObj.expandAll(true); 
+				initDeptId();
+				userTable();
+				
+	            var curMenu = treeObj.getNodes()[0];
+	            treeObj.selectNode(curMenu);
+	            var a = $("#" + treeObj.getNodes()[0].tId + "_a");
+	            a.addClass("cur");
+				
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+})();
+
+/**
+ * 模块：用户列表
+ */
+ 
+function userTable(){
+	$userTable = $('#user-table').bootstrapTable('destroy').bootstrapTable({
+			url: '/kscd/api/user/',
+			method: 'GET',
+			uniqueId: 'id',
+			striped: false,
+			cache: false,
+			sortName: 'weight',
+			sortable: true,
+			sortOrder: "asc",
+			sidePagination: "server",
+			undefinedText: '--',
+			singleSelect: true,
+			//showRefresh   : true,
+			//showColumns   : true,
+			toolbar: '#user-table-toolbar',
+			search: true,
+			strictSearch: true,
+			clickToSelect: true,
+			pagination: true,
+			pageNumber: 1,
+			pageSize: 10,
+			pageList: [5, 10, 20, 50, 100],
+			paginationPreText: "上一页",
+			paginationNextText: "下一页",
+			paginationLoop: false,
+			//showToggle: true,
+			//cardView: false,
+			//detailView: false,
+			//showPaginationSwitch: true,
+			//得到查询的参数
+			queryParamsType: "",
+			queryParams: function (params) {
+				var temp = {
+					'pageSize': params.pageSize,
+					'pageNumber': params.pageNumber,
+					'searchText': params.searchText,
+					'sortName': params.sortName,
+					'sortOrder': params.sortOrder,
+					'dept_id': chosenDeptId,
+				};
+				console.log("获取表格数据前提交的参数");
+				console.log(temp);
+				return temp;
+			},
+			columns: [
+				{
+					checkbox: true
+				},{
+					field: 'id',
+					title:'ID',
+					valign: 'middle',
+					width: '6%',
+					sortable: true
+				},{
+					field: 'name',
+					title:'账号',
+					valign: 'middle',
+					width: '16%'
+				},{
+					field: 'alias',
+					title:'姓名',
+					width: '16%'
+				},{
+					field: 'gquota',
+					title:'个人空间配额',
+					width: '16%',
+					formatter: userTableSpaceSize
+				},{
+					field: 'squota',
+					title:'私密空间配额',
+					formatter: userTablePrivateSize
+				}
+			],
+			onLoadSuccess: function () {
+				console.log("表格数据加载成功");
+			},
+			onLoadError: function () {
+				toastr.error("数据加载失败！", "错误提示");
+			},
+		    onClickRow: function (row, $element) {
+		        var id = row.ID;
+		        //EditViewById(id, 'view');
+		        console.log("点击所在行的信息");
+		        console.log(row);
+		        console.log($element);
+		    }
+	});
+}
+
+function userTableSpaceSize(value, row, index) {
+   var result = unitConversion(value);
+   return result;
+}
+
+function userTablePrivateSize(value, row, index){
+   var result = unitConversion(value);
+   return result;
+}
+
+/**
+ * 功能：创建用户
+ */
+ 
+$("#create-user-button").click(function(){
+	if(chosenDeptId == ""){
+		toastr.error("请先选择一个部门", "错误提示");
+	}else{
+		//ajax begin
+		$.ajax({
+			type: "POST",
+			url: "/kscd/api/user/check-permission/",
+			data: JSON.stringify({dept_id: chosenDeptId}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("创建用户判断是否有权限时返回的所有数据");
+				console.log(data);
+				if(data.ret){
+					$("#add-user-modal").modal({
+						show: true,
+						backdrop:'static'
+					});
+					//ajax begin
+						$.ajax({
+							type: "GET",
+							url: '/kscd/api/nas/',
+							data: {},
+							dataType: "json",
+							success: function(data){
+								console.log("创建用户时获取到的存储服务器");
+								console.log(data);
+								if(data.ret){
+									var len = data.nases.length;
+									var options = '';
+									for(var i = 0; i<len; i++){
+										options += "<option value='" + data.nases[i].id + "'>" + data.nases[i].name + "</option>";
+									}
+									$("#add-user-modal-server").html(options);
+								}else{
+									toastr.error(data.msg, "错误提示");
+								}
+							},
+							error: function(data){
+								toastr.error("连接失败", "错误提示");
+							}
+						});
+					//ajax end
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+		//ajax end
+	}
+});
+
+//设置默认密码
+$("#add-user-modal-default-password").click(function(){
+ 	if($(this).is(":checked")){
+ 		$("#add-user-modal-password").val("qwer1234").change();
+ 	}else{
+ 		$("#add-user-modal-password").val("").change();
+ 	}
+});
+
+// $('#add-user-modal-usbkey').click(function(){
+// 	var isUsbKey = $(this).is(':checked');
+
+// 	if (isUsbKey){
+// 			$('#add-user-modal-form [name="addUserModalCustom"]').show();
+// 			var val = $('#add-user-modal-form input[type=radio][name=addUserModalIdType]:checked').val();
+// 			if(val == "sn"){
+// 				$("#add-user-modal-user-name").val("SN字段").change();
+// 			}else if(val == "cn"){
+// 				$("#add-user-modal-user-name").val("CN字段").change();
+// 			}else if(val == "custom"){
+// 				$("#add-user-modal-user-name").val("").change();
+// 			}
+// 	} else{
+// 			$('#add-user-modal-form [name="addUserModalCustom"]').hide();
+// 			$("#add-user-modal-user-name").val("").change();
+// 	}
+// });
+
+// $('#add-user-modal-form input[type=radio][name=addUserModalIdType]').click(function() {
+// 	if ($(this).is(':checked')) {
+// 		if(this.value == "sn"){
+// 			$("#add-user-modal-user-name").val("SN字段").change();
+// 		}else if(this.value == "cn"){
+// 			$("#add-user-modal-user-name").val("CN字段").change();
+// 		}else if(this.value == "custom"){
+// 			$("#add-user-modal-user-name").val("").change();
+// 		}
+// 	}
+// });
+
+$('#add-user-modal-form').bootstrapValidator({
+	message: 'This value is not valid',
+	feedbackIcons: {
+		valid: 'glyphicon glyphicon-ok',
+		invalid: 'glyphicon glyphicon-remove',
+		validating: 'glyphicon glyphicon-refresh'
+	},
+	excluded:[":disabled"],
+	fields: {
+		addUserModalUserName: {
+			message: '账号无效',
+			validators: {
+				notEmpty: {
+					message: '账号不能为空'
+				},
+				threshold: 6, 
+                remote: {
+                    url: '/kscd/api/user/check-name/',
+                    message: '账号已存在',
+                    delay:  1000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({name: $('#add-user-modal-user-name').val()});
+                    }
+                },
+				regexp: {
+					regexp: /^[a-zA-Z0-9_]{6,32}$/,
+					message: '账号为6至32位字母、数字或下滑线'
+				}
+			}
+		},
+		addUserModalName: {
+			message: '姓名无效',
+			validators: {
+				notEmpty: {
+					message: '姓名不能为空'
+				},
+				threshold: 2, 
+                remote: {
+                    url: '/kscd/api/user/check-alias/',
+                    message: '姓名已存在',
+                    delay:  1000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({alias: $('#add-user-modal-name').val()});
+                    }
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '姓名为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+			}
+		},
+		addUserModalSpace: {
+			message: '个人空间配额无效',
+			validators: {
+				notEmpty: {
+					message: '个人空间配额不能为空'
+				},
+				regexp: {
+					regexp: /^(([1-9]\d?)|(100))$/,
+					message: '个人空间配额为1-100之间整数'
+				}
+			}
+		},
+		addUserModalPrivate: {
+			message: '私密空间配额',
+			validators: {
+				notEmpty: {
+					message: '私密空间配额不能为空'
+				},
+				regexp: {
+					regexp: /^(([1-9]\d?)|(100))$/,
+					message: '私密空间配额为1-100之间整数'
+				}
+			}
+		},
+		addUserModalPassword: {
+			message: '密码无效',
+			trigger:"change",
+			validators: {
+				notEmpty: {
+					message: '密码不能为空'
+				},
+				regexp: {
+					regexp: /^[a-zA-Z0-9_]{6,32}$/,
+					message: '密码为6至32位字母、数字或者下划线'
+				}
+			}
+		},
+		addUserModalWeight: {
+			message: '权重设置无效',
+			validators: {
+				notEmpty : {
+					message : '权重不能为空'
+				},
+				regexp : {
+					regexp : /^((-?[1-9][0-9]*)|(0)|([1-9][0-9]*))$/,
+					message : '权重只能为整数'
+				}
+			}
+		},
+		addUserModalServer: {
+			message: '存储服务器无效',
+			validators: {
+				notEmpty: {
+					message: '存储服务器不能为空'
+				}
+			}
+		}
+	}
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var name = $("#add-user-modal-user-name").val();
+	var alias = $("#add-user-modal-name").val();
+	var dept_id = chosenDeptId;
+	var auth_type = 1;
+	var nas_id = $("#add-user-modal-server").val();
+	var gquota = $("#add-user-modal-space").val();
+	var squota = $("#add-user-modal-private").val();
+	var weight = $("#add-user-modal-weight").val();
+	var passwd = $("#add-user-modal-password").val();
+	var params = JSON.stringify({name: name, alias: alias, dept_id: dept_id, auth_type: auth_type, nas_id: nas_id, gquota: gquota, squota: squota, weight: weight, passwd: passwd});
+	console.log("创建用户时提交的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/user/',
+		data: params,
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("创建用户提交数据成功时返回的数据");
+			console.log(data);
+			if(data.ret){
+				$("#add-user-modal-form")[0].reset();
+				//$("#add-user-modal-custom").hide();
+				$("#add-user-modal-form").data('bootstrapValidator').resetForm();
+				$("#add-user-modal").modal("hide");
+				toastr.success("创建用户成功", "成功提示");
+				$userTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：上移
+ */
+ 
+$("#user-move-up-button").click(function(){
+	var checkedUser = $userTable.bootstrapTable('getSelections');
+	var len = checkedUser.length;
+	if(len == 0){
+		toastr.error("请选择需要移动的用户", "错误提示");
+	}else if(len == 1){
+		//ajax begin
+		$.ajax({
+			type: "POST",
+			url: "/kscd/api/user/check-permission/",
+			data: JSON.stringify({dept_id: chosenDeptId}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("上移用户判断是否有权限时返回的数据");
+				console.log(data);
+				if(data.ret){
+					// ajax begin
+					var params = JSON.stringify({"user_id": checkedUser[0].id, "action": "move_up"});
+					$.ajax({
+						type: "POST",
+						url: '/kscd/api/user/sort/',
+						data: params,
+						dataType: "json",
+						contentType: 'application/json',
+						success: function(data){
+							console.log("移动用户提交成功时后台返回的数据");
+							console.log(data);
+							if(data.ret){
+									toastr.success("上移用户成功", "成功提示");
+									$userTable.bootstrapTable("refresh");
+							}else{
+								toastr.error(data.msg, "错误提示");
+							}
+						},
+						error: function(data){
+							toastr.error("连接失败", "错误提示");
+						}
+					});
+					// ajax end
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+		//ajax end
+	}else{
+		toastr.error("一次只能移动一个用户", "错误提示");
+	}
+}); 
+
+ /**
+  * 模块：下移
+  */
+  
+$("#user-move-down-button").click(function(){
+	var checkedUser = $userTable.bootstrapTable('getSelections');
+	var len = checkedUser.length;
+	if(len == 0){
+		toastr.error("请选择需要移动的用户", "错误提示");
+	}else if(len == 1){
+		//ajax begin
+		$.ajax({
+			type: "POST",
+			url: "/kscd/api/user/check-permission/",
+			data: JSON.stringify({dept_id: chosenDeptId}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("上移用户判断是否有权限时返回的数据");
+				console.log(data);
+				if(data.ret){
+					// ajax begin
+					var params = JSON.stringify({"user_id": checkedUser[0].id, "action": "move_down"});
+					$.ajax({
+						type: "POST",
+						url: '/kscd/api/user/sort/',
+						data: params,
+						dataType: "json",
+						contentType: 'application/json',
+						success: function(data){
+							console.log("移动用户提交成功时后台返回的数据");
+							console.log(data);
+							if(data.ret){
+									toastr.success("下移用户成功", "成功提示");
+									$userTable.bootstrapTable("refresh");
+							}else{
+								toastr.error(data.msg, "错误提示");
+							}
+						},
+						error: function(data){
+							toastr.error("连接失败", "错误提示");
+						}
+					});
+					// ajax end
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+		//ajax end
+	}else{
+		toastr.error("一次只能移动一个用户", "错误提示");
+	}
+}); 
+ 
+/**
+ * 模块：编辑用户
+ */
+ 
+$("#edit-user-button").click(function(){
+	var checkedUser = $userTable.bootstrapTable('getSelections');
+	console.log("选择的表格数据");
+	console.log(checkedUser);
+	var len = checkedUser.length;
+	if(len == 0){
+		toastr.error("请选择需要编辑的用户", "错误提示");
+	}else if(len == 1){
+		//ajax begin
+		$.ajax({
+			type: "POST",
+			url: "/kscd/api/user/check-permission/",
+			data: JSON.stringify({dept_id: chosenDeptId}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("编辑用户判断是否有权限时返回的数据");
+				console.log(data);
+				if(data.ret){
+					$("#edit-user-modal").modal({
+						show: true,
+						backdrop:'static'
+					});
+					$("#edit-user-id").val(checkedUser[0].id);
+					$("#edit-user-user-name").val(checkedUser[0].name);
+					$("#edit-user-name").val(checkedUser[0].alias);
+					$("#edit-user-space").val(Number(checkedUser[0].gquota)/(1024*1024*1024));
+					$("#edit-user-private").val(Number(checkedUser[0].squota)/(1024*1024*1024));
+					$("#edit-user-weight").val(checkedUser[0].weight);
+					$("#edit-user-password").val("edit_user_password");
+					$("#edit-user-server").html('<option value="' + checkedUser[0].nas_id +'" checked>' + checkedUser[0].nas_name + '</option>');
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+		//ajax end
+	}else if(len > 1){
+		toastr.error("一次只能编辑一个用户", "错误提示");
+	}
+});
+
+$('#edit-user-modal-form').bootstrapValidator({
+	message: 'This value is not valid',
+	feedbackIcons: {
+		valid: 'glyphicon glyphicon-ok',
+		invalid: 'glyphicon glyphicon-remove',
+		validating: 'glyphicon glyphicon-refresh'
+	},
+	fields: {
+		editUserName: {
+			message: '姓名无效',
+			validators: {
+				notEmpty: {
+					message: '姓名不能为空'
+				},
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '姓名为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+			}
+		},
+		editUserSpace: {
+			message: '个人空间配额无效',
+			validators: {
+				notEmpty: {
+					message: '个人空间配额不能为空'
+				},
+				regexp: {
+					regexp: /^(([1-9]\d?)|(100))$/,
+					message: '个人空间配额只能为1-100之间整数'
+				}
+			}
+		},
+		editUserPrivate: {
+			message: '私密空间配额',
+			validators: {
+				notEmpty: {
+					message: '私密空间配额不能为空'
+				},
+				regexp: {
+					regexp: /^(([1-9]\d?)|(100))$/,
+					message: '私密空间配额只能为1-100之间整数'
+				}
+			}
+		},
+		editUserWeight: {
+			message: '权重设置无效',
+			validators: {
+				notEmpty : {
+					message : '权重不能为空'
+				},
+				regexp : {
+					regexp : /^((-?[1-9][0-9]*)|(0))$/,
+					message : '权重只能为整数'
+				}
+			}
+		},
+		editUserPassword: {
+			message: '密码无效',
+			validators: {
+				notEmpty: {
+					message: '密码不能为空'
+				},
+				regexp: {
+					regexp: /^[a-zA-Z0-9_]{6,32}$/,
+					message: '密码为6至32位字母、数字或者下划线'
+				}
+			}
+		},
+		editUserServer: {
+			message: '存储服务器无效',
+			validators: {
+				notEmpty: {
+					message: '存储服务器不能为空'
+				}
+			}
+		}
+	}
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var alias = $("#edit-user-name").val();
+	var gquota = $("#edit-user-space").val();
+	var squota = $("#edit-user-private").val();
+	var weight = $("#edit-user-weight").val();
+	var passwd = $("#edit-user-password").val();
+	var params = JSON.stringify({alias: alias, gquota: gquota, squota: squota, weight: weight, passwd: passwd});
+	var url = '/kscd/api/user/' +  $("#edit-user-id").val() + "/";
+	console.log("修改用户时的url为：");
+	console.log(url);
+	console.log("修改用户时提交到后台的参数为：");
+	console.log(params);
+	$.ajax({
+		type: "PATCH",
+		url: url,
+		data: params,
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("编辑用户提交成功时后台返回的数据");
+			console.log(data);
+			if(data.ret){
+					$("#edit-user-modal-form").data('bootstrapValidator').resetForm();
+					$("#edit-user-modal").modal("hide");
+					toastr.success("编辑用户成功", "成功提示");
+					$userTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：删除用户
+ */
+function deleteUser(){
+	var checkedUser = $userTable.bootstrapTable('getSelections');
+	var len = checkedUser.length;
+	if(len == 0){
+		toastr.error("请选择需要删除的用户", "错误提示");
+	}
+	if(len == 1){
+		console.log('删除用户的url');
+		console.log('/kscd/api/user/' +  checkedUser[0].id);
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/user/' +  checkedUser[0].id,
+			data: {},
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log('删除用户时返回的所有数据');
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除用户成功", "正确提示");
+					$userTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}else if(len > 1){
+		var idArray = [];
+		for(var i = 0; i<len; i++){
+			idArray.push(checkedUser[i].id);
+		}
+		console.log('删除的用户数组');
+		console.log(idArray);
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/user/',
+			data: JSON.stringify({ids: idArray}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log('删除用户时返回的所有数据');
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除用户成功", "正确提示");
+					$userTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}
+}
+
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+}
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

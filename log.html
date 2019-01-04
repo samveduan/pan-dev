@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>审计日志管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+      <div class="main-right-in">
+      
+			<!-- =============================================== // content begin ====================================================== -->
+			<div class="botton-panel" id="log-table-toolbar">
+				<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="search-log-button">
+					<i class="glyphicon glyphicon-search"></i>
+					<span>检索</span>
+				</a>
+				
+				<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" onclick="location.reload();">
+					<i class="icon wb-grid-4"></i>
+					<span>全部</span>
+				</a>
+			</div>
+			
+			<table id="log-table" data-toggle="table" class="table table-bordered table-hover">
+			
+			</table>
+			
+			<!-- =============================================== content end // ====================================================== -->
+
+      </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+
+<div class="modal fade" id="log-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create" style="width: 700px;">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="clearValidate('log-modal-form')">
+							×
+						</button>
+						<h4 class="modal-title"> 日志检索 </h4>
+					</div>
+					<form id="log-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body" style="padding-right: 20px;">
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">关键字：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <input type="text" class="form-control" id="log-modal-keyword" name="logModalKeyword" placeholder="" />
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal"></label>
+                             <div class="col-lg-4 col-md-4 col-sm-4" style="text-align: right;padding-right: 10px;">
+                                 <label for="log-modal-advance-search" style="cursor: pointer;font-weight: normal;">
+ 									<input type="checkbox" id="log-modal-advance-search" name="logModalAdvanceSearch">
+ 									高级
+ 								</label>
+                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">日志类型：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <select id="log-modal-type" name="logModalType" class="form-control">
+									<option value="">所有</option>
+									<option value="admlog">管理员操作</option>
+									<option value="userlog">用户操作</option>
+									<option value="syslog">系统日志</option>
+									<option value="otherlog">其他日志</option>							
+								</select>
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">操作结果：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <select id="log-modal-result" name="logModalResult" class="form-control">
+									<option value="">所有</option>
+									<option value="success">成功</option>
+									<option value="failed">失败</option>
+								</select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">操作者：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <input type="text" class="form-control" id="log-modal-operator" name="logModalOperator">
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">操作对象：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <input type="text" class="form-control" id="log-modal-object" name="logModalObject">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">开始时间：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <input type="text" class="form-control Wdate" id="log-modal-start-time"  style="height: 34px;border: 1px solid #e4eaec;" validation="endtime" name="logModalStartTime" value onClick="WdatePicker({lang:'zh-cn',maxDate:'#F{$dp.$D(\'log-modal-end-time\')}',dateFmt:'yyyy-MM-dd'}); this.blur();">
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">结束时间：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <input type="text" class="form-control Wdate" id="log-modal-end-time" style="height: 34px;border: 1px solid #e4eaec;" validation="endtime" name="logModalEndTime" value onClick="WdatePicker({lang:'zh-cn',minDate:'#F{$dp.$D(\'log-modal-start-time\')}',dateFmt:'yyyy-MM-dd'}); this.blur();">
+                            </div>
+                        </div>
+
+                        <div class="form-group" name='admAdvanceOption' style="display: none">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">风险级别：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <select id="log-modal-level" name="logModalLevel" class="form-control">
+									<option value="">所有</option>
+									<option value="emergency">紧急</option>
+									<option value="alert">警报</option>
+									<option value="critical">关键</option>
+									<option value="error">错误</option>
+									<option value="warning">警告</option>
+									<option value="notice">通知</option>
+									<option value="informational">信息</option>
+									<option value="debug">调试</option>
+								</select>
+                            </div>
+<!--                             <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">功能模块：</label> -->
+<!--                             <div class="col-lg-4 col-md-4 col-sm-4"> -->
+<!--                                 <select id="log-modal-module" name="logModalModule" class="form-control"> -->
+<!-- 									<option value="">所有</option> -->
+<!-- 									<option value="plat">系统管理</option> -->
+<!-- 									<option value="kmj">文件加密</option> -->
+<!-- 									<option value="kdcs">磁盘加密</option>												 -->
+<!-- 								</select> -->
+<!--                             </div> -->
+                        </div>
+
+                        <div class="form-group" name='admAdvanceOption' style="display: none">
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">操作大类：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <select id="log-modal-parent-type" name="logModalParentType" class="form-control">
+                                	<option value="">请选择</option>
+                                	<option value="m_sys_info">系统信息</option>
+                                	<option value="m_dept">部门管理</option>
+                                	<option value="m_user">用户管理</option>
+                                	<option value="m_admin">管理员管理</option>
+                                	<option value="m_share_group">共享组管理</option>
+                                	<option value="m_nas">存储器服务器管理</option>
+                                	<option value="m_audit">审计日志管理</option>
+                                	<option value="m_sys_manage">系统管理</option>
+                                	<option value="m_general_storage">个人空间管理</option>
+                                	<option value="m_external_link">外链管理</option>
+                                	<option value="m_myshare">我的共享管理</option>
+                                	<option value="m_receive_share">收到的共享管理</option>
+                                	<option value="m_recycle">回收站管理</option>
+                                </select>
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal align-right">操作小类：</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <select id="log-modal-sub-type" name="logModalSubType" class="form-control">
+
+                                </select>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="log-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onclick="clearValidate('log-modal-form')">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/My97DatePicker/WdatePicker.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 日志检索字段定义
+ */
+
+var keyword; // 关键字
+var type; // 日志类型
+var result; // 操作结果
+var subject; // 操作者
+var object; // 操作对象
+var startTime; // 开始时间
+var endTime; // 结束时间
+var level; // 风险级别
+var parentType; // 操作大类
+var subType; // 操作小类
+
+/**
+ * 获取日志列表
+ */
+var $logTable = $('#log-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/audit/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'id',                        
+    striped: false,                         
+    cache: false, 
+	sortName: 'id',
+    sortable: true,
+    sortOrder: "desc",
+    sidePagination: "server",
+    undefinedText: '--',
+    //singleSelect: true,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#log-table-toolbar',
+    search: false,
+    strictSearch: true,
+    clickToSelect: false,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,//排序列名
+			'sortOrder': params.sortOrder,//排位命令（desc，asc）
+			'keyword': keyword,
+			'type': type,
+			'result': result,
+			'subject': subject,
+			'object': object,
+			'startTime': startTime,
+			'endTime': endTime,
+			'level': level,
+			'parentType': parentType,
+			'subType': subType
+        };
+		console.log(temp);
+        return temp;
+    },
+    columns: [
+		{
+		     field: 'subject',
+		     title:'操作者',
+		     valign: 'middle',
+		     width: '12%'
+		},{
+		   	 field: 'mtype',
+		   	 title:'操作大类',
+		     width: '12%'
+		},{
+			 field: 'subtype',
+			 title:'操作小类',
+		     width: '15%'
+		},{
+		     field: 'result',
+		     title:'操作结果',
+	         width: '8%'
+		},{
+		     field: 'time',
+		     title:'时间',
+	         width: 200
+		},{
+		     field: 'level',
+		     title:'风险级别',
+	         width: '8%'
+		},{
+		     field: 'detail',
+		     title:'备注'
+		}
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+        toastr.error("数据加载失败！", "错误提示");
+    },
+    onDblClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+    },
+    onClickRow: function (row, $element) {
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    },
+    rowStyle: function (row, index) { //设置行的特殊样式
+        //这里有5个取值颜色['active', 'success', 'info', 'warning', 'danger'];
+        var strclass = "";
+        if (row.level == "错误") {
+            strclass = "danger";
+            //console.log(row);
+        }else if(row.level == "警告"){
+        	strclass = "warning";
+        }
+        return { classes: strclass }
+    }
+});
+
+function getCurrentDate(){
+	var time = new Date();
+	var year = time.getFullYear();
+	var month = time.getMonth() + 1;
+	var date = time.getDate();
+	var currentDate = year + "-" + month + "-" + date;
+	document.getElementById("log-modal-start-time").value = currentDate;
+	document.getElementById("log-modal-end-time").value = currentDate;
+}
+
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+	getCurrentDate();
+	$("#" + formId + ' [name="admAdvanceOption"]').each(function(){
+		$(this).hide();
+	});
+}
+
+$('#log-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    excluded:[":disabled"],
+    fields: {
+    	logModalStartTime: {
+            message: '开始时间无效',
+            trigger:"change",
+            validators: {
+                notEmpty: {
+                    message: '开始时间不能为空'
+                }
+            }
+        },
+        logModalEndTime: {
+            message: '结束时间无效',
+            trigger:"change",
+            validators: {
+                notEmpty: {
+                    message: '结束时间不能为空'
+                }
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	keyword = filterHtml($("#log-modal-keyword").val());
+	type = $("#log-modal-type").val();
+	result = $("#log-modal-result").val();
+	subject = filterHtml($("#log-modal-operator").val());
+	object = filterHtml($("#log-modal-object").val());
+	startTime = $("#log-modal-start-time").val();
+	endTime = $("#log-modal-end-time").val();
+	level = $("#log-modal-level").val();
+	parentType = $("#log-modal-parent-type").val();
+	subType = $("#log-modal-sub-type").val();
+	$logTable.bootstrapTable('selectPage',1);
+	$("#log-modal-form")[0].reset();
+	$("#log-modal-form").data('bootstrapValidator').resetForm();
+	getCurrentDate();
+	$("#" + 'log-modal-form' + ' [name="admAdvanceOption"]').each(function(){
+		$(this).hide();
+	});
+	$("#log-modal").modal("hide");
+});
+
+$(function() {
+	$("#search-log-button").click(function(){
+		$("#log-modal").modal("show");
+		getCurrentDate();
+	});
+    
+	var sys_info = [{name: '', value: '所有'}, {name: 'sys_info_show', value: '查看系统信息'}, {name: 'sys_info_online_users', value: '获取在线用户数'}];
+	var dept = [{name: '', value: '所有'}, {name: 'dept_add', value: '创建部门'}, {name: 'dept_delete', value: '删除部门'}, {name: 'dept_update', value: '修改部门'}, {name: 'dept_query_one', value: '查看单个部门信息'}, {name: 'dept_query_many', value: '查看所有部门信息'}];
+	var user = [{name: '', value: '所有'}, {name: 'user_add', value: '创建用户'}, {name: 'user_delete', value: '删除用户'}, {name: 'user_update', value: '修改用户'}, {name: 'user_query_one', value: '查看单个用户信息'}, {name: 'user_query_many_dept', value: '查看部门用户信息'}, {name: 'user_check_perm', value: '用户权限校验'}, {name: 'user_query_many_all', value: '查看所有用户'}, {name: 'user_token', value: '口令用户获取token'}, {name: 'user_verify_pwd', value: '口令用户验证'}, {name: 'user_change_password', value: '修改用户密码'}];
+	var admin = [{name: '', value: '所有'}, {name: 'admin_add', value: '创建管理员'}, {name: 'admin_delete', value: '删除管理员'}, {name: 'admin_update', value: '修改管理员'}, {name: 'admin_query', value: '查看管理员'}, {name: 'admin_token', value: '口令用户获取token'}, {name: 'admin_verify_pwd', value: '口令用户验证'}, {name: 'admin_usbkey_random', value: 'usbkey用户获取random'}, {name: 'admin_usbkey_verify_token', value: 'usbkey用户验证token'}, {name: 'admin_usbkey_verify_cert', value: 'usbkey用户验证cert'}, {name: 'admin_query_one', value: '查看单个管理员'}, {name: 'admin_query_many', value: '查看所有管理员'}, {name: 'admin_change_password', value: '修改管理员密码'}];
+	var share_group = [{name: '', value: '所有'}, {name: 'share_group_add', value: '创建共享组'}, {name: 'share_group_delete', value: '删除共享组'}, {name: 'share_group_update', value: '修改共享组'}, {name: 'share_group_query', value: '查看共享组信息'}, {name: 'share_group_add_user', value: '共享组中添加用户'}, {name: 'share_group_delete_user', value: '共享组中删除用户'}, {name: 'share_group_query_user', value: '查看共享组中用户信息'}, {name: 'share_group_check_perm', value: '共享组权限校验'}];
+	var nas = [{name: '', value: '所有'}, {name: 'nas_add', value: '创建存储服务器'}, {name: 'nas_delete', value: '删除存储服务器'}, {name: 'nas_update', value: '修改存储服务器'}, {name: 'nas_query_one', value: '查看单个存储服务器信息'}, {name: 'nas_query_all', value: '查看所有存储服务器信息'}];
+	var audit = [{name: '', value: '所有'}, {name: 'audit_query', value: '查看审计日志'}, {name: 'audit_config', value: '配置审计日志转储策略'}];
+	var sys_manage = [{name: '', value: '所有'}, {name: 'sys_manage_control_service', value: '启停网盘服务'}, {name: 'sys_manage_export_metadata', value: '导出数据库'}, {name: 'sys_manage_import_metadata', value: '导入数据库'}, {name: 'sys_manage_seclevel_add', value: '创建密级信息'}, {name: 'sys_manage_seclevel_query', value: '获取密级信息'}, {name: 'sys_manage_seclevel_update', value: '修改密级信息'}, {name: 'sys_manage_seclevel_delete', value: '删除密级信息'}, {name: 'sys_manage_control_external_link', value: '启停外链设置'}];
+	var general_storage = [{name: '', value: '所有'}, {name: 'general_storage_query', value: '查看个人空间'}, {name: 'general_storage_create_dir', value: '创建文件夹'}, {name: 'general_storage_rename', value: '重命名'}, {name: 'general_storage_move_file', value: '移动文件'}, {name: 'general_storage_copy_file', value: '复制文件'}, {name: 'general_storage_copy_dir', value: '复制文件夹'}, {name: 'general_storage_delete_file', value: '删除文件'}, {name: 'general_storage_delete_dir', value: '删除文件夹'}, {name: 'general_storage_upload_file', value: '上传文件'}, {name: 'general_storage_download_file', value: '下载文件'}, {name: 'general_storage_set_seclevel', value: '标记密级'}, {name: 'general_storage_share_touser', value: '共享给用户'}, {name: 'general_storage_share_todept', value: '共享给部门'}, {name: 'general_storage_share_togroup', value: '共享给共享组'}, {name: 'general_storage_move_tosec', value: '移动到私密存储空间'}, {name: 'general_storage_query_all_dirs', value: '查看通用空间文件夹层级目录'}, {name: 'general_storage_query_user_size', value: '查看个人空间配额信息'}];
+	var external_link = [{name: '', value: '所有'}, {name: 'external_link_add', value: '创建外链'}, {name: 'external_link_query', value: '查看外链'}, {name: 'external_link_delete', value: '删除数据库'}, {name: 'external_link_verify', value: '获取外链提取页面'}, {name: 'external_link_files', value: '获取外链文件列表'}];
+	var myshare = [{name: '', value: '所有'}, {name: 'myshare_touser_query', value: '查看共享给用户的信息'}, {name: 'myshare_togroup_query', value: '查看共享给共享组的信息'}, {name: 'myshare_todept_query', value: '查看共享给部门的信息'}, {name: 'myshare_touser_update', value: '修改共享给用户的信息'}, {name: 'myshare_togroup_update', value: '修改共享给共享组的信息'}, {name: 'myshare_todept_update', value: '修改共享给部门的信息'}, {name: 'myshare_touser_delete', value: '删除共享给用户的信息'}, {name: 'myshare_togroup_delete', value: '删除共享给共享组的信息'}, {name: 'myshare_todept_delete', value: '删除共享给部门的信息'}, {name: 'myshare_download', value: '下载我的共享的文件'}, {name: 'myshare_touser_query_users', value: '查看共享文件的用户'}, {name: 'myshare_togroup_query_groups', value: '查看共享文件的共享组'}, {name: 'myshare_todept_query_depts', value: '查看共享文件的部门'}];
+	var receive_share = [{name: '', value: '所有'}, {name: 'receive_share_fromuser_query', value: '查看从用户收到的共享信息'}, {name: 'receive_share_fromgroup_query', value: '查看从共享组收到的共享信息'}, {name: 'receive_share_fromdept_query', value: '查看从部门收到的共享信息'}, {name: 'receive_share_download', value: '下载收到的共享的文件'}, {name: 'receive_share_unread_count', value: '查看我的未读共享信息个数'}];
+	var recycle = [{name: '', value: '所有'}, {name: 'recycle_restore', value: '还原文件'}, {name: 'recycle_delete', value: '删除回收站文件'}, {name: 'recycle_clear', value: '清空回收文件'}, {name: 'recycle_show', value: '显示回收站'}];
+
+	$("#log-modal-parent-type").change(function(){
+		var parentType = $(this).val();
+		var html = "";
+		if(parentType == "m_sys_info"){
+			for(var i = 0; i<sys_info.length; i++){
+				html += '<option value="' + sys_info[i].name + '">' + sys_info[i].value + '</option>';
+			}
+		}else if(parentType == "m_dept"){
+			for(var i = 0; i<dept.length; i++){
+				html += '<option value="' + dept[i].name + '">' + dept[i].value + '</option>';
+			}
+		}else if(parentType == "m_user"){
+			for(var i = 0; i<user.length; i++){
+				html += '<option value="' + user[i].name + '">' + user[i].value + '</option>';
+			}
+		}else if(parentType == "m_admin"){
+			for(var i = 0; i<admin.length; i++){
+				html += '<option value="' + admin[i].name + '">' + admin[i].value + '</option>';
+			}
+		}else if(parentType == "m_share_group"){
+			for(var i = 0; i<share_group.length; i++){
+				html += '<option value="' + share_group[i].name + '">' + share_group[i].value + '</option>';
+			}
+		}else if(parentType == "m_nas"){
+			for(var i = 0; i<nas.length; i++){
+				html += '<option value="' + nas[i].name + '">' + nas[i].value + '</option>';
+			}
+		}else if(parentType == "m_audit"){
+			for(var i = 0; i<audit.length; i++){
+				html += '<option value="' + audit[i].name + '">' + audit[i].value + '</option>';
+			}
+		}else if(parentType == "m_sys_manage"){
+			for(var i = 0; i<sys_manage.length; i++){
+				html += '<option value="' + sys_manage[i].name + '">' + sys_manage[i].value + '</option>';
+			}
+		}else if(parentType == "m_general_storage"){
+			for(var i = 0; i<general_storage.length; i++){
+				html += '<option value="' + general_storage[i].name + '">' + general_storage[i].value + '</option>';
+			}
+		}else if(parentType == "m_external_link"){
+			for(var i = 0; i<external_link.length; i++){
+				html += '<option value="' + external_link[i].name + '">' + external_link[i].value + '</option>';
+			}
+		}else if(parentType == "m_myshare"){
+			for(var i = 0; i<myshare.length; i++){
+				html += '<option value="' + myshare[i].name + '">' + myshare[i].value + '</option>';
+			}
+		}else if(parentType == "m_receive_share"){
+			for(var i = 0; i<receive_share.length; i++){
+				html += '<option value="' + receive_share[i].name + '">' + receive_share[i].value + '</option>';
+			}
+		}else if(parentType == "m_recycle"){
+			for(var i = 0; i<recycle.length; i++){
+				html += '<option value="' + recycle[i].name + '">' + recycle[i].value + '</option>';
+			}
+		}else{
+			html += "";
+		}
+		$("#log-modal-sub-type").html(html);
+	});
+
+	$('#log-modal-advance-search').click(function(){
+		var isAdvance = $('#log-modal-advance-search').is(':checked');
+
+		if (isAdvance){
+			$('#log-modal-form [name="admAdvanceOption"]').each(function(){
+				$(this).show();
+			});
+		} else{
+			$('#log-modal-form [name="admAdvanceOption"]').each(function(){
+				$(this).hide();
+			});
+		}
+	});
+});
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

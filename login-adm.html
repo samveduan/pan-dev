@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>管理员登录 - 麒麟信安云盘</title>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<style>
+.form-group{
+	margin-left: 0;
+	margin-right: 0;
+}
+/*表单验证*/
+.help-block{
+	margin-top: 36px;
+}
+</style>
+</head>
+
+<body class="narrow-page-bg">
+<div class="top-nav">
+ 	<div class="top-nav-left">
+    	<div class="top-nav-logo"><img src="/static/img/logo.png"><span>麒麟信安云盘</span></div>
+   	</div>
+
+     <div class="top-nav-func">
+		<a id="href_usbkey_window" href="/static/activex/win/安全控件.exe" style="font-size:14px;padding-right:20px;color:#ffffff;"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> 安全控件下载</a>
+	</div>
+</div>
+    
+<div id="login">
+	<form id="login-form" method="post" class="form-horizontal" action="">
+		<div id="login-name">管理员登录</div>
+		<div class="form-group" style="position: relative;margin-bottom: 25px;">
+			<span class="input-group-addon login-icon">
+			   <i class="glyphicon glyphicon-random" aria-hidden="true" style="padding-top: 2px;"></i>
+			</span>
+	          <div class="col-lg-12 col-md-12 col-sm-12">
+	           	<select class="form-control" id="login-choice" style="background:#f0f0f0">
+					<option value="kl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用户名密码</option>
+					<!--  <option value="znk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USBKEY认证</option> -->
+				</select>
+	          </div>
+	          <div id="login-setting"><a href="javascript:void(0)" id="certificate-setting-button">设置</a></div>
+	     </div>
+	      
+		<div class="form-group login-input-container" id="login-user-name-container">
+			<span class="input-group-addon login-icon" style="color: #555555;">
+			   <i class="glyphicon glyphicon-user" aria-hidden="true" style="padding-top: 2px;"></i>
+			</span>
+	          <div class="col-lg-12 col-md-12 col-sm-12" style="height: 34px;">
+	              <input type="text" class="form-control login-input" id="login-user-name" name="loginUserName"/>
+	              <div class="login-input-below" id="login-user-name-tips">用户名</div>
+	          </div>
+	     </div>
+	     
+	     <input type="text" style="width: 0; height: 0;margin: 0; padding: 0; border: 0; position: absolute; left: 0; top: 0"/>
+		
+	     <div class="form-group login-input-container" id="login-password-container">
+				<span class="input-group-addon login-icon" style="color: #555555;">
+				   <i class="glyphicon glyphicon-lock" aria-hidden="true" style="padding-top: 2px;"></i>
+				</span>
+				
+		        <div class="col-lg-12 col-md-12 col-sm-12" style="height: 34px;">
+		              <input type="password" class="form-control login-input" id="login-password" name="loginPassword" autocomplete="new-password"/>
+		              <div class="login-input-below" id="login-password-tips">密码</div>
+		        </div>
+	    </div>
+	    
+	    <div class="form-group login-input-container" id="login-pin-container">
+				<span class="input-group-addon login-icon" style="color: #555555;">
+				   <i class="glyphicon glyphicon-lock" aria-hidden="true" style="padding-top: 2px;"></i>
+				</span>
+				
+		        <div class="col-lg-12 col-md-12 col-sm-12" style="height: 34px;">
+		              <input type="text" class="form-control login-input" id="login-pin" name="loginPin"/>
+		              <div class="login-input-below" id="login-pin-tips">PIN</div>
+		        </div>
+	    </div>
+	
+		<button class="btn btn-success" id="login-submit" type="submit" style="">登&nbsp;&nbsp;&nbsp;&nbsp;录 </button>
+		
+		<div id="copyright">总参谋部第五十一研究所 研制</div>
+	
+	</form>
+</div>
+	
+<!-- // all modal begin -->
+<div class="modal fade" id="certificate-setting-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">证书设置</h4>
+			</div>
+			<form id="certificate-setting-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+	
+						<div class="form-group" id="certificate-setting-modal-custom" name='certificateSettingModalCustom'>
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">用户名定义：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                              	<label class="radio-inline">
+									<input type="radio" id="certificate-setting-modal-user-sn" name="certificateSettingModalIdType" value="sn">
+									使用SN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="certificate-setting-modal-user-cn" name="certificateSettingModalIdType" value="cn">
+									使用CN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="certificate-setting-modal-user-custom" name="certificateSettingModalIdType" value="custom" checked="checked">
+									自定义
+								</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">证书级别：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+								<select name="certificateSettingModalLevel" id="certificate-setting-modal-level" class="form-control">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+								</select>
+                            </div>
+                        </div>
+	
+					<!-- modal-body end // -->
+				</div>
+				<div class="modal-footer">
+						<button class="btn btn-success" type="button" data-dismiss="modal">
+							确 定
+						</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+<!-- all modal end // -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+    /**
+	 * 获取USBKEY登录设置
+     */
+    var usbkeyLogin = {
+        'idType': '',
+        'level': ''
+    };
+
+	$("#login-user-name").focus(function(){
+		$("#login-user-name-tips").empty();
+	})
+	
+	$("#login-user-name").blur(function(){
+		if($("#login-user-name").val() == ""){
+			$("#login-user-name-tips").text("用户名");
+		}
+	})
+	
+	$("#login-password").focus(function(){
+		$("#login-password-tips").empty();
+	})
+	
+	$("#login-password").blur(function(){
+		if($("#login-password").val() == ""){
+			$("#login-password-tips").text("密码");
+		}
+	})
+	
+	$("#login-pin").focus(function(){
+		$("#login-pin-tips").empty();
+	})
+	
+	$("#login-pin").blur(function(){
+		if($("#login-pin").val() == ""){
+			$("#login-pin-tips").text("PIN码");
+		}
+	});
+
+	(function(){
+        var options = $("#login-choice option:selected");
+        if(options.val() == "znk"){
+            $("#login-password-container").hide();
+            var val = $('#certificate-setting-modal-form input[type=radio][name=certificateSettingModalIdType]:checked').val();
+            if(val == "custom"){
+
+            }else if(val == "cn"){
+                $("#login-user-name-container").hide();
+            }else if(val == "sn"){
+                $("#login-user-name-container").hide();
+            }
+        }else if(options.val() == "kl"){
+            $("#certificate-setting-button").hide();
+            $("#login-pin-container").hide();
+        }
+	})();
+	
+	$("#login-choice").change(function(){
+	    var options = $("#login-choice option:selected");
+		if(options.val() == "znk"){
+            $("#certificate-setting-button").show();
+            var val = $('#certificate-setting-modal-form input[type=radio][name=certificateSettingModalIdType]:checked').val();
+            if(val == "custom"){
+                $("#login-user-name-container").show();
+                $("#login-password-container").hide();
+                $("#login-pin-container").show();
+            }else if(val == "cn"){
+                $("#login-user-name-container").hide();
+                $("#login-password-container").hide();
+                $("#login-pin-container").show();
+            }else if(val == "sn"){
+                $("#login-user-name-container").hide();
+                $("#login-password-container").hide();
+                $("#login-pin-container").show();
+            }
+        }else if(options.val() == "kl"){
+			$("#certificate-setting-button").hide();
+			$("#login-user-name-container").show();
+			$("#login-password-container").show();
+			$("#login-pin-container").hide();
+		}
+	});
+	
+	$('#certificate-setting-modal-form input[type=radio][name=certificateSettingModalIdType]').change(function(){
+		if(this.value == "custom"){
+			$("#login-user-name-container").show();
+			$("#login-password-container").hide();
+			$("#login-pin-container").show();
+		}else if(this.value == "cn"){
+			$("#login-user-name-container").hide();
+			$("#login-password-container").hide();
+			$("#login-pin-container").show();
+		}else if(this.value == "sn"){
+			$("#login-user-name-container").hide();
+			$("#login-password-container").hide();
+			$("#login-pin-container").show();
+		}
+	});
+	
+	$("#certificate-setting-button").click(function(){
+		$("#certificate-setting-modal").modal("show");
+	});
+
+	function closeCertificateSettingModal(){
+	    var val = $('#certificate-setting-modal-form input[type=radio][name=certificateSettingModalIdType]:checked').val();
+	    var level = $("#certificate-setting-modal-level").val();
+        usbkeyLogin.idType = val;
+        usbkeyLogin.level = level;
+	}
+	
+	$('#login-form').bootstrapValidator({
+		message : '该值无效',
+		feedbackIcons : {
+			valid : 'glyphicon glyphicon-ok',
+			invalid : 'glyphicon glyphicon-remove',
+			validating : 'glyphicon glyphicon-refresh'
+		},
+		fields : {
+			loginUserName : {
+				message : '用户名无效',
+				validators : {
+					notEmpty : {
+						message : '用户名不能为空'
+					}
+				}
+			},
+			loginPassword : {
+				message : '密码无效',
+				validators : {
+	                notEmpty: {
+	                    message: '密码不能为空'
+	                }
+				}
+			},
+			loginPin : {
+				message : 'PIN码无效',
+				validators : {
+					notEmpty : {
+						message : 'PIN码不能为空'
+					}
+				}
+			}
+		}
+	}).on('success.form.bv', function(e) {
+		e.preventDefault();
+        //var val = $('#certificate-setting-modal-form input[type=radio][name=certificateSettingModalIdType]:checked').val();
+        //var level = $("#certificate-setting-modal-level").val();
+        //usbkeyLogin.idType = val;
+        //usbkeyLogin.level = level;
+        var options = $("#login-choice option:selected");
+        if(options.val() == "znk") {
+			var pin = $("#login-pin").val();
+        }else if(options.val() == "kl"){
+			var userName = $("#login-user-name").val();
+            var password = $("#login-password").val();
+            $.ajax({
+                type: "GET",
+                url: '/kscd/api/admin/pwd-token/',
+                data: JSON.stringify({}),
+                dataType: "json",
+                success: function(data){
+                	if(data.ret == true){
+						var tk = data.token;
+						var salt = 'kylinos';
+                		var key = hex_sha1(hex_sha1(hex_sha1(password)+salt)+tk);
+						//阶段二
+						$.ajax({
+							type: "POST",
+							url: '/kscd/api/admin/passwd/',
+							data: JSON.stringify({login_name: userName, key: key, token: tk}),
+							dataType: "json",
+							success: function(data){
+								if(data.ret == true){
+									toastr.success('登录成功', "正确提示");
+									$("#login-form").data('bootstrapValidator').resetForm();
+									$("#login-user-name").val("");
+									$("#login-password").val("");
+									$("#login-pin").val("");
+									$("#login-user-name-tips").text("用户名");
+									$("#login-password-tips").text("密码");
+									$("#login-pin-tips").text("PIN码");
+									window.location.href = '/kscd/system-info/';
+								}else{
+									toastr.error(data.msg, "错误提示");
+								}
+							},
+							error: function(data){
+								toastr.error('连接错误', "错误提示");
+							}
+						});
+                	}else{
+						toastr.error(data.msg, "错误提示");
+					}
+                },
+                error: function(data){
+                    toastr.error('连接错误', "错误提示");
+                }
+            });
+		}
+	});
+</script>
+</body>
+</html>

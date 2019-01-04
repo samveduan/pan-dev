@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>回收站</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-user.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   	      <li><a href="/kscd/general-storage/" target="_self"><span class="fa fa-user" aria-hidden="true"></span> &nbsp;个人空间</a></li>
+<!--           <li><a href="/kscd/secret-storage/" target="_self"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> 私密空间</a></li> -->
+          <li><a href="/kscd/external-link/" target="_self"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 我的外链</a></li>
+          <li><a href="/kscd/myshare/" target="_self"><span class="fa fa-users" aria-hidden="true"></span> 我的共享</a></li>
+          <li><a href="/kscd/receive-share/" target="_self"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> 收到的共享 <span class="badge" id="share-numbers"></span></a></li>
+          <li><a href="/kscd/recycle/" target="_self" class="main-left-menu-active"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 回收站</a></li>
+     </ul>
+       
+	{% include "dist/capacity-user.html" %}
+       
+</div>
+<!-- left menu  end //-->
+
+<!-- //right begin -->
+<div class="main-right">
+      <div class="main-right-in">
+      
+			<!-- =============================================== // content begin ====================================================== -->
+			
+			<div class="botton-panel" id="recycle-bin-table-toolbar">
+						<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="restore-recycle-bin-button">
+			            	<i class="fa fa-reply"></i>
+			            	<span>还原</span>
+			            </a>
+			            
+			            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="delete-recycle-bin-button">
+			            	<i class="glyphicon glyphicon-minus"></i>
+			            	<span>删除</span>
+			            </a>
+			            
+			            <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="clear-recycle-bin-button">
+			            	<i class="glyphicon glyphicon-trash"></i>
+			            	<span>清空回收站</span>
+			            </a>
+			</div>
+				    	
+			<!-- // main begin -->
+			<table id="recycle-bin-talbe" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+			
+			</table>
+			<!-- main end //-->
+			
+			<!-- ===============================================  content end // ====================================================== -->
+
+      </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+
+<!-- // recycle begin -->
+<div class="modal fade" id="recycle-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="initDirPidForRecycle()">
+							×
+						</button>
+						<h4 class="modal-title"> 还原 </h4>
+					</div>
+					<form id="recycle-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+
+                        <div class="form-group" >
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">还原位置：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5" style="position:relative;z-index:9999999;" id="recycle-modal-choose-dir-div">
+                                <input type="text" class="form-control" name="recycleModalChooseDir" id="recycle-modal-choose-dir" onFocus="this.blur();" onClick="chooseDirShowMenu();"/>
+                                <div id="recycle-modal-dir-content" class="ztree-content">
+                                    <ul id="recycle-modal-dir-tree" class="ztree ztree-modal"></ul>
+                                </div>
+                            </div>
+                        </div>
+                                     
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="recycle-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="initDirPidForRecycle()">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- recycle end // -->
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 模块：获取删除的列表
+ */
+
+var thisPage; //当前页码
+var thisPageSize; //当前每页条数
+
+var $recycleBinTalbe = $('#recycle-bin-talbe').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/recycling-station/show/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#recycle-bin-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+   			'pageSize' : params.pageSize,
+   			'pageNumber' : params.pageNumber,
+   			'searchText': params.searchText,
+   			'sortName': params.sortName,
+   			'sortOrder': params.sortOrder,
+        };
+        thisPage = params.pageNumber;
+        thisPageSize = params.pageSize;
+        console.log("获取文件/文件夹列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'file_type',
+	        title:'类型',
+	        valign: 'middle',
+	        width: 50,
+	        formatter: fileTableType
+        },{
+	        field: 'file_name',
+	        title:'文件名',
+	        valign: 'middle'
+        },{
+	        field: 'size',
+	        title:'大小',
+	        width: 160,
+            formatter: fileTableSize
+        },{
+	        field: 'status',
+	        title:'原位置',
+	        width: '16%'
+        },{
+	        field: 'chg_time',
+	        width: 200,
+	        title:'删除时间'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+        toastr.error("数据加载失败", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+function fileTableType(value, row, index){
+   var result;
+   if(value == 0){
+	   result = '<img src="/static/img/opened_folder.png">'
+   }else{
+	   result = '<img src="/static/img/document.png">'
+   }
+   return result;
+}
+
+function fileTableSize (value, row, index) {
+	   var result;
+	   if(row.file_type == 0){
+	      result = "--";
+	   }else{
+	      result = unitConversion(row.size);
+	   }
+	   return result;
+}
+
+/**
+ * 模块：还原
+ */
+  
+var chooseDirIdForRecycle = "";
+ 
+var dirTreeSetting = {
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+			$("#recycle-modal-choose-dir").val(treeNode.name).change();
+			chooseDirIdForRecycle = treeNode.file_id;
+			console.log("创建部门时选择的父部门id");
+			console.log(chooseDirIdForRecycle);
+		}
+	}
+};
+
+function chooseDirShowMenu() {
+	var parentDept = $("#recycle-modal-choose-dir");
+	var parentDeptOffset = $("#recycle-modal-choose-dir").offset();
+	$("#recycle-modal-dir-content").css({
+		right : -10 + "px",
+		top : (parentDept.outerHeight() + 5) + "px"
+	}).slideDown("fast");
+	
+	var treeObj = $.fn.zTree.getZTreeObj("recycle-modal-dir-tree"); 
+	treeObj.expandAll(true); 
+
+	$("body").bind("mousedown", onAddDeptBodyDown);
+}
+
+function addDeptHideMenu() {
+	$("#recycle-modal-dir-content").fadeOut("fast");
+	$("body").unbind("mousedown", onAddDeptBodyDown);
+}
+
+function onAddDeptBodyDown(event) {
+	if (!(event.target.id == "menuBtn"
+			|| event.target.id == "recycle-modal-choose-dir"
+			|| event.target.id == "recycle-modal-dir-content" || $(event.target).parents(
+			"#recycle-modal-dir-content").length > 0)) {
+		addDeptHideMenu();
+	}
+}
+ 
+$("#restore-recycle-bin-button").click(function(){
+	var checkedFile = $recycleBinTalbe.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择要还原的文件或者文件夹", "错误提示");
+	}else if(len == 1){
+		$("#recycle-modal").modal("show");
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/general-storage/dirs/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+				console.log("还原文件和文件夹时获取到的文件夹树");
+				console.log(data);
+				if(data.ret){
+					$.fn.zTree.init($("#recycle-modal-dir-tree"), dirTreeSetting, data.dirs);
+					var treeObj = $.fn.zTree.getZTreeObj("recycle-modal-dir-tree");
+					treeObj.expandAll(true);
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+	        },
+	        error: function(data){
+	            toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}else if(len > 1){
+		toastr.error("一次只能还原一个文件或者文件夹", "错误提示");
+	}
+});
+
+$('#recycle-modal').bootstrapValidator({
+	message : 'This value is not valid',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	excluded:[":disabled"],
+	fields : {
+		recycleModalChooseDir : {
+			message : '文件夹不能为空',
+			trigger:"change",
+			validators : {
+				notEmpty : {
+					message : '请选择还原位置'
+				}
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	var checkedFile = $recycleBinTalbe.bootstrapTable('getSelections');
+	var params = JSON.stringify({"file_id": checkedFile[0].file_id, file_pid: chooseDirIdForRecycle});
+	console.log("还原文件时传给后台的参数：");
+	console.log(params);
+	$.ajax({
+	    type: "POST",
+	    url: '/kscd/api/recycling-station/restore/',
+	    data: params,
+	    dataType: "json",
+	    success: function(data){
+			console.log("还原文件时后台返回的数据：");
+			console.log(data);
+	        if(data.ret == true){
+	        	toastr.success("文件还原成功", "正确提示");
+	        	$("#recycle-modal").modal('hide');
+	        	$recycleBinTalbe.bootstrapTable("refresh");
+	        	chooseDirIdForRecycle = "";
+	        }else{
+	        	toastr.error(data.msg, "错误提示");
+	        }
+	    },
+	    error: function(data){
+	    	toastr.error("连接失败", "错误提示");
+	    }
+	});
+});
+
+function initDirPidForRecycle(){
+	chooseDirIdForRecycle = "";
+}
+
+/**
+ * 模块：删除
+ */
+ 
+$("#delete-recycle-bin-button").click(function(){
+	var checkedFile = $recycleBinTalbe.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	var currentPageDataLen = $recycleBinTalbe.bootstrapTable('getData').length;//当前页数据条数
+	
+	if(len == 0){
+		toastr.error("请选择要删除的文件或者文件夹", "错误提示");
+	}else if( len > 0){
+		var idArray = [];
+		
+		for(var i = 0; i<len; i++){
+			idArray.push(checkedFile[i].file_id);
+		}
+		
+		var params = JSON.stringify({"file_id": idArray});
+		console.log("删除文件时传给后台的参数：");
+		console.log(params);
+		
+	    $.ajax({
+	        type: "DELETE",
+	        url: '/kscd/api/recycling-station/delete/',
+	        data: params,
+	        dataType: "json",
+	        success: function(data){
+	        	console.log("删除文件时后台返回的数据");
+	        	console.log(data);
+	            if(data.ret == true){
+	            	toastr.success('删除成功', "正确提示");
+	            	var totalRows = Number($("#bootstrapTableTotalRows").text());
+	            	var totalPages = Math.ceil(totalRows/thisPageSize);
+					if(thisPage == totalPages){
+		            	if(len < currentPageDataLen){
+		            		$recycleBinTalbe.bootstrapTable("refresh");
+		            	}else if(len == currentPageDataLen){
+		            		$recycleBinTalbe.bootstrapTable('prevPage');
+		            	}
+					}else{
+						$recycleBinTalbe.bootstrapTable("refresh");
+					}
+	            }else{
+	            	toastr.error(data.msg, "错误提示");
+	            }
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+});
+
+$("#clear-recycle-bin-button").click(function(){
+    $.ajax({
+        type: "DELETE",
+        url: '/kscd/api/recycling-station/clear/',
+        data: {},
+        dataType: "json",
+        success: function(data){
+        	console.log("清空回收站时从后台返回的数据");
+        	console.log(data);
+            if(data.ret == true){
+            	toastr.success('清空回收站成功', "正确提示");
+            	$recycleBinTalbe.bootstrapTable("refresh");
+            }else{
+            	toastr.error(data.msg, "错误提示");
+            }
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+</script>
+
+{% include "dist/common.html" %}
+
+{% include "dist/common-user.html" %}
+
+{% include "dist/unread-counts.html" %}
+</body>
+</html>

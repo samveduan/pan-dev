@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>个人空间</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/webuploader/webuploader.css" type="text/css">
+</head>
+
+<body>
+		<!-- =============================================== // content begin ====================================================== -->
+		
+		<div id="upload-file-container">
+			<div id="upload-file-container-tools">
+				<b style="float: left; padding-left: 10px;">文件上传</b>
+				<button class="btn btn-action" title="最小化" id="upload-file-container-tools-down"><i class="glyphicon glyphicon-triangle-bottom" style="color: #000000"></i></button>
+				<button class="btn btn-action" title="最大化" id="upload-file-container-tools-up"><i class="glyphicon glyphicon-triangle-top" style="color: #000000"></i></button>
+				<button class="btn btn-action" title="关闭" id="upload-file-container-tools-close"><i class="glyphicon glyphicon-remove" style="color: #000000"></i></button>
+			</div>
+		
+			<!-- // 断点续传   begin -->
+			<!-- 隐藏域 实时保存上传进度 -->
+			<input id="progress-bar" type="hidden"/>
+			<div id="uploader" class="wu-example" style="position: relative;">
+			    <label class="text-right" style="font-weight:100;float:left;margin-left:10px;"></label>
+			    <div class="btns">
+			    <div id="picker" class="webuploader-container">
+			        <div class="webuploader-pick">选择文件</div>
+			        <div id="rt_rt_1bchdejhrarjdvd11h41eoh1nt1" style="position: absolute; top: 0px; left: 0px; width: 88px; height: 35px; overflow: hidden; bottom: auto; right: auto;">
+			            <input id="file_bp" name="file" class="webuploader-element-invisible" type="file" />
+			            <label style="opacity: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: rgb(255, 255, 255) none repeat scroll 0% 0%;"></label>
+			        </div>
+			    </div>
+			    
+			    <button class="btn m-b-xs btn-sm btn-info btn-addon" id="startOrStopBtn" style="margin-top:20px; position: absolute;top: -20px; left: 100px;display: none;">开始上传</button>
+			    
+			    <div style="height: 10px;"></div>
+			    
+			    <!-- 文件列表：选择文件后在该div显示 -->
+			    <div id="thelist" class="uploader-list list-group-item clearfix ng-hide" style="margin-left:10px;"></div>
+				<!-- <label class="text-right" style="font-weight:100;float:left;margin-left:15px;width:144px;margin-right:15px;"></label> -->
+			    </div>
+			</div>
+			<!-- 断点续传   end // -->
+		
+		</div>
+		
+		<div class="botton-panel" id="file-table-toolbar">
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="upload-file-button">
+				<i class="glyphicon glyphicon-open"></i>
+				<span>上传文件</span>
+			</a>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="new-folder-button">
+				<i class="glyphicon glyphicon-folder-open"></i>
+				<span> &nbsp;&nbsp;新建文件夹</span>
+			</a>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="download-button">
+				<i class="glyphicon glyphicon-download-alt"></i>
+				<span>下载</span>
+			</a>
+		</div>
+		
+		<div class="base-path">当前路径：<span id="base-path">根文件夹</span></div>
+		
+		<!-- // main begin -->
+		<div id="file-table-contain" style="overflow: auto;">
+			<table id="file-table" data-toggle="table" class="table table-bordered table-striped" style="border: 1px solid #d4d8da;z-index: -1;">
+			
+			</table>
+		</div>
+		<!-- main end // -->
+		
+		<!-- =============================================== content end // ====================================================== -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+<div class="modal fade" id="new-dir-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="clearValidate('new-dir-modal-form');">
+					×
+				</button>
+				<h4 class="modal-title">新建文件夹</h4>
+			</div>
+			<form id="new-dir-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<div class="form-group">
+						<label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+						<div class="col-lg-5 col-md-5 col-sm-5">
+							<input type="text" class="form-control" id="new-dir-modal-name" name="newDirModalName" value=""/>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+							<div class="checkbox">
+
+							</div>
+						</div>
+					</div>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="new-dir-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="clearValidate('new-dir-modal-form');">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/webuploader/webuploader.min.js"></script>
+<script type="text/javascript">
+/**
+ * 功能： 初始化参数
+ */
+var file_id = 1; //初始化当前文件夹，1为根目录
+var path_arr = [{file_id: 1, name: '根文件夹'}]; //初始化路径
+var clickByDirOrPageButton = 0; // 判断用户点击的是文件夹链接还是分页按钮(或每页显示数下拉框)， 1表示文件夹链接，0为分页按钮/每页显示数下拉框
+var thisPage; //当前页码
+var thisPageSize; //当前每页条数
+
+/**
+ * 模块：文件上传
+ */
+
+/*******************初始化参数*********************************/
+var $list = $('#thelist'); //文件列表
+var $btn = $('#startOrStopBtn'); //开始上传按钮
+var state = 'pending'; //初始按钮状态
+var uploader; //uploader对象
+var fileMd5; //文件唯一标识
+
+/******************下面的参数是自定义的*************************/
+var fileName; //文件名称
+var fileSize;
+var oldProgress; //如果该文件之前上传过 已经上传的进度是多少
+var count = 0; //当前正在上传的文件在数组中的下标，一次上传多个文件时使用
+var filesArr = new Array(); //文件数组：每当有文件被添加进队列的时候 就push到数组中
+var map = {}; //key存储文件id，value存储该文件上传过的进度
+
+/***************************************************** 监听分块上传过程中的三个时间点 start ***********************************************************/
+WebUploader.Uploader.register({
+    "before-send-file":"beforeSendFile", //整个文件上传前
+    "before-send":"beforeSend", //每个分片上传前
+    "after-send-file":"afterSendFile", //分片上传完毕
+},
+{
+    //时间点1：所有分块进行上传之前调用此函数
+    beforeSendFile:function(file){
+        var deferred = WebUploader.Deferred();
+        //1、计算文件的唯一标记fileMd5，用于断点续传  如果.md5File(file)方法里只写一个file参数则计算MD5值会很慢 所以加了后面的参数：10*1024*1024
+        (new WebUploader.Uploader()).md5File(file,0,10*1024*1024).progress(function(percentage){
+            $('#'+file.id ).find('p.state').text('正在读取文件信息...');
+        })
+        .then(function(val){
+            $('#' + file.id ).find("p.state").text("成功获取文件信息...");
+            fileMd5 = val;
+            //获取文件信息后进入下一步
+            deferred.resolve();
+        });
+        
+        fileName = file.name; //为自定义参数文件名赋值
+ 		fileSize = file.size;
+        return deferred.promise();
+    },  
+    //时间点2：如果有分块上传，则每个分块上传之前调用此函数
+    beforeSend:function(block){
+        var deferred = WebUploader.Deferred();
+        $.ajax({
+            type:"POST",
+            url:"/kscd/api/general-storage/upload-file/check-chunk/", //ajax验证每一个分片
+            data:{
+                fileName: fileName,
+                jindutiao: $("#progress-bar").val(),
+                fileMd5: fileMd5, //文件唯一标记 
+                chunk: block.chunk, //当前分块下标
+                chunkSize: block.end-block.start //当前分块大小
+            },
+            cache: false,
+            async: false, // 与js同步
+            timeout: 1000, //todo 超时的话，只能认为该分片未上传过
+            dataType: "json",
+            success: function(response){
+                if(response.ifExist){
+                    //分块存在，跳过 
+                    deferred.reject();
+                }else{
+                    //分块不存在或不完整，重新发送该分块内容
+                    deferred.resolve();
+                }
+            }
+        });
+                         
+        this.owner.options.formData.fileMd5 = fileMd5;
+        deferred.resolve();
+        return deferred.promise();
+    },
+    //时间点3：所有分块上传成功后调用此函数（每个文件）
+    afterSendFile:function(file){
+        //如果分块上传成功，则通知后台合并分块
+        $.ajax({
+            type: "POST",
+            url: "/kscd/api/general-storage/upload-file/merge-chunks/", //ajax将所有片段合并成整体
+            data: {
+                fileName: fileName,
+				fileSize: fileSize,
+                fileMd5: fileMd5,
+                filePid: file_id
+            },
+            dataType: "json",
+            success: function(data){
+            	setTimeout(function(){
+                    count++; //每上传完成一个文件 count+1
+                    if(count <= filesArr.length - 1){
+                        uploader.upload(filesArr[count].id); //上传文件列表中的下一个文件
+                    }
+                    
+                    console.log("判断分片是否接收完全：");
+                    console.log(data);
+                    
+                    //合并成功之后的操作
+                    if(data.ret){
+                   		$('#' + file.id).find('p.state').text('上传成功');
+                   		$fileTable.bootstrapTable("refresh");
+                    }else{
+                   	 	$('#' + file.id).find('p.state').text('上传失败，' + data.msg);
+                    }
+            	}, 500)
+            }  
+        });  
+    }  
+});
+/***************************************************** 监听分块上传过程中的三个时间点 end **************************************************************/
+
+/************************************************************ 初始化WebUploader start ******************************************************************/
+uploader = WebUploader.create({
+    auto: false, //选择文件后是否自动上传
+    chunked: true, //开启分片上传
+    chunkSize: 10*1024*1024, // 如果要分片，分多大一片？默认大小为5M
+    chunkRetry: 3, //如果某个分片由于网络问题出错，允许自动重传多少次
+    threads: 1, //上传并发数。允许同时最大上传进程数[默认值：3]
+    duplicate: true, //是否重复上传（同时选择多个一样的文件），true可以重复上传
+    prepareNextFile: true, //上传当前分片时预处理下一分片
+    swf: '/static/libs/webuploader/Uploader.swf', // swf文件路径
+    server: '/kscd/api/general-storage/upload-file/', // 文件接收服务端
+    fileSizeLimit: 5*1024*1024*1024, //5G 验证文件总大小是否超出限制, 超出则不允许加入队列
+    fileSingleSizeLimit: 3*1024*1024*1024, //3G 验证单个文件大小是否超出限制, 超出则不允许加入队列
+    pick: {
+            id: '#picker', //这个id是你要点击上传文件按钮的外层div的id
+            multiple : true //是否可以批量上传，true可以同时选择多个文件
+    },
+    resize: false, //不压缩image, 默认如果是jpeg，文件上传前会先压缩再上传！
+    accept: {
+        //允许上传的文件后缀，不带点，多个用逗号分割
+        extensions: "txt,jpg,jpeg,bmp,png,zip,rar,war,pdf,cebx,doc,docx,ppt,pptx,xls,xlsx",  
+        mimeTypes: '.txt,.jpg,.jpeg,.bmp,.png,.zip,.rar,.war,.pdf,.cebx,.doc,.docx,.ppt,.pptx,.xls,.xlsx',
+    }
+});
+/************************************************************ 初始化WebUploader end ********************************************************************/
+
+//当有文件被添加进队列的时候（点击上传文件按钮，弹出文件选择框，选择完文件点击确定后触发的事件）
+uploader.on('fileQueued', function(file) {
+    //限制单个文件的大小 超出了提示
+    if(file.size > 1*1024*1024*1024){
+        toastr.error("单个文件大小不能超过1G");
+        return false;
+    }
+    
+    /*************如果一次只能选择一个文件，再次选择替换前一个，就增加如下代码*******************************/
+    //清空文件队列
+    //$list.html("");
+    //清空文件数组
+    //filesArr=[];
+    /*************如果一次只能选择一个文件，再次选择替换前一个，就增加以上代码*******************************/
+    
+    //将选择的文件添加进文件数组
+    filesArr.push(file);
+
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/upload-file/selectProgressByFileName/", //先检查该文件是否上传过，如果上传过，上传进度是多少
+        data: {
+            fileName: file.name, //文件名
+            fileMd5: fileMd5
+        },
+        cache: false,
+        async: false, // 同步
+        dataType: "json",
+        success: function(res){
+        	console.log(res);
+            //上传过
+            if(res.jindutiao > 0 && res.jindutiao < 1){
+                //上传过的进度的百分比
+                oldProgress = res.jindutiao/100;
+                //如果上传过 上传了多少
+                var progressBarStyle = "width:" + res.jindutiao + "%";
+                $list.append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">已上传' + res.jindutiao + '%</p>' +
+                    '<a href="javascript:void(0);" class="btnRemoveFile">删除</a>' +
+                        '<div class="progress progress-striped active" style="margin-bottom: 0;">' +
+                  '<div class="progress-bar" role="progressbar" style="' + progressBarStyle +'">' +
+                  '</div>' +
+                '</div>' +
+                '</div>');
+                //将上传过的进度存入map集合
+                map[file.id] = oldProgress;
+            }else if(res.jindutiao == 0){//没有上传过
+                $list.append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">等待上传...</p>' +
+                    '<a href="javascript:void(0);" class="btnRemoveFile">删除</a>' +
+                '</div>' );
+                $("#startOrStopBtn").show();
+            }else if(res.jindutiao == 1){
+            	toastr.error(file.name + "在当前目录中已经添加过", "错误提示");
+            }
+        }
+    });
+    uploader.stop(true);
+    //删除队列中的文件
+    $(".btnRemoveFile").bind("click", function() {
+        var fileItem = $(this).parent();
+        uploader.removeFile($(fileItem).attr("id"), true);
+        $(fileItem).fadeOut(function() {
+            $(fileItem).remove();
+        });
+    
+        //数组中的文件也要删除
+        var len = filesArr.length;
+        for(var i = 0; i < len; i++){
+            if(filesArr[i].id == $(fileItem).attr("id")){
+                filesArr.splice(i,1);//i是要删除的元素在数组中的下标，1代表从下标位置开始连续删除一个元素
+            }
+        }
+        
+        //当数组为0时，隐藏上传按钮
+        if(len == 0){
+        	$("#startOrStopBtn").hide();
+        }
+    });
+});
+     
+//文件上传过程中创建进度条实时显示
+uploader.on('uploadProgress', function(file, percentage) {
+    var $li = $( '#' + file.id ),
+    $percent = $li.find('.progress .progress-bar');
+    //避免重复创建
+    if (!$percent.length){
+        $percent = $('<div class="progress progress-striped active" style="margin-bottom: 0">' +
+          '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+          '</div>' +
+        '</div>').appendTo($li).find('.progress-bar');
+    }
+    
+    //将实时进度存入隐藏域
+    $("#progress-bar").val(Math.round(percentage * 100));
+    
+    //根据fielId获得当前要上传的文件的进度
+    var oldProgressValue = map[file.id];
+    
+    if(percentage < oldProgressValue && oldProgressValue != 1){
+        $li.find('p.state').text('上传中' + Math.round(oldProgressValue * 100) + '%');
+        $percent.css('width', oldProgressValue * 100 + '%');
+    }else{
+        $li.find('p.state').text('上传中' + Math.round(percentage * 100) + '%');
+        $percent.css('width', percentage * 100 + '%');
+    }
+});
+
+//上传成功后执行的方法（单个）
+uploader.on('uploadSuccess', function(file) {
+    //上传成功去掉进度条
+    $('#' + file.id).find('.progress').fadeOut();
+    //隐藏删除按钮
+    $(".btnRemoveFile").hide();
+    //隐藏上传按钮
+    $("#startOrStopBtn").hide();
+    $('#' + file.id).find('p.state').text('正在处理，请稍后...');
+});
+
+//上传出错后执行的方法
+uploader.on('uploadError', function(file) {
+    errorUpload = true;
+    $btn.text('开始上传');
+    uploader.stop(true);
+    $('#' + file.id).find('p.state').text('上传出错，请检查网络连接');
+});
+  
+//文件上传成功失败都会走这个方法
+uploader.on('uploadComplete', function(file) {
+
+});
+
+uploader.on('all', function(type){
+    if (type === 'startUpload'){
+        state = 'uploading';
+        $("#startOrStopBtn").show(); //开始上传，显示上传按钮 +
+    }else if(type === 'stopUpload'){
+        state = 'paused';
+        $("#startOrStopBtn").show(); //暂停，显示上传按钮 +
+    }else if(type === 'uploadFinished'){
+        state = 'done';
+        $("#startOrStopBtn").hide(); //上传完成，隐藏上传按钮 +
+    }
+
+    if (state === 'uploading'){
+        $btn.text('暂停上传');
+    } else {
+        $btn.text('开始上传');
+    }
+});
+
+//上传按钮的onclick时间
+$btn.on('click', function(){
+    if (state === 'uploading'){
+        uploader.stop(true);
+    } else {
+        //当前上传文件的文件名
+        var currentFileName;
+        //当前上传文件的文件id
+        var currentFileId;
+        //count=0 说明没开始传 默认从文件列表的第一个开始传
+        if(count == 0){
+            currentFileName = filesArr[0].name;
+            currentFileId = filesArr[0].id;
+        }else{
+            if(count <= filesArr.length-1){
+                currentFileName = filesArr[count].name;
+                currentFileId = filesArr[count].id;
+            }
+        }
+        
+        //先查询该文件是否上传过 如果上传过已经上传的进度是多少
+        $.ajax({
+            type: "POST",
+            url: "/kscd/api/general-storage/upload-file/selectProgressByFileName/",
+            data: {
+                fileName: currentFileName//文件名
+            },
+            cache: false,
+            async: false,  // 同步
+            dataType: "json",
+            success: function(res){
+                //如果上传过 将进度存入map
+                if(res.jindutiao > 0){
+                    map[currentFileId] = res.jindutiao/100;
+                }
+                //执行上传
+                uploader.upload(currentFileId);
+            }
+        });
+    }
+});
+
+//浏览器检测
+$("#upload-file-button").click(function(){
+	var mozilla = /firefox/.test(navigator.userAgent.toLowerCase());
+	var webkit = /webkit/.test(navigator.userAgent.toLowerCase());
+	var opera = /opera/.test(navigator.userAgent.toLowerCase());
+	var msie = /msie/.test(navigator.userAgent.toLowerCase());
+	
+	if(mozilla || webkit || opera){
+		$("#upload-file-container").animate({
+		    bottom: 0
+		});
+		$("#upload-file-container-tools-up").hide();
+		$("#upload-file-container-tools-down").show();
+	}else{
+		toastr.error("该浏览器不支持断点续传，请使用Chrome、Firefox、Opera浏览器", "错误提示");
+	}
+});
+
+//上传框工具按钮设置
+$("#upload-file-container-tools-down").click(function(){
+	$("#upload-file-container").animate({
+	    bottom: '-385px'
+	});
+	$(this).hide();
+	$("#upload-file-container-tools-up").show();
+});
+
+$("#upload-file-container-tools-up").click(function(){
+    $("#upload-file-container").animate({
+        bottom: 0
+    });
+    $(this).hide();
+    $("#upload-file-container-tools-down").show();
+});
+
+$("#upload-file-container-tools-close").click(function(){
+    $("#upload-file-container").animate({
+        bottom: "-430px"
+    });
+    $("#upload-file-container-tools-up").hide();
+    $("#upload-file-container-tools-down").show();
+    
+    filesArr=[];
+    count = 0;
+    map = {};
+    $list.html("");
+});
+
+/**
+ * 模块： 获取文件/文件夹列表
+ */
+
+var $fileTable = $('#file-table').bootstrapTable('destroy').bootstrapTable({
+    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+    url: '/kscd/api/general-storage/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh: true,
+    //showColumns: true,
+    //toolbar: '#file-table-toolbar',
+    search: false,
+    strictSearch: true,
+    clickToSelect: false,
+    pagination: true,
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 20, 50 ,100],
+    paginationPreText: "上一页",
+    paginationNextText: "下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType: "",
+    queryParams: function(params){
+        var temp = {
+			'pageSize': params.pageSize,
+			'pageNumber': clickByDirOrPageButton === 1 ? 1 : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+			'file_id': file_id
+        };
+        thisPage = params.pageNumber;
+        thisPageSize = params.pageSize;
+        console.log("获取文件/文件夹列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+            checkbox: true
+        },
+        {
+        	title: '序号',
+        	width: 60,
+        	valign: "middle",
+        	formatter: function (value, row, index) {
+        		return index + 1;
+        	}
+        },
+        {
+            field: 'file_type',
+            title: '类型',
+            valign: 'middle',
+            width: 50,
+            formatter: fileTableType
+        },
+        {
+            field: 'name',
+            title: '名称',
+            valign: 'middle',
+            formatter: fileTableName
+        },{
+            field: 'size',
+            title: '大小',
+            width: '16%',
+            formatter: fileTableSize
+        },{
+            field: 'create_time',
+            title: '上传时间',
+            width: 200
+        },{
+            field: 'chg_time',
+            title: '最后修改时间',
+            width: 200
+        }
+    ],
+    onLoadSuccess: function () {
+    	
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickedRow: function (row, $element) {
+        var id = row.ID;
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    },
+    onCheck: function(row){
+
+    },
+    onCheckAll: function(row){
+
+    },
+    onUncheck: function(row){
+
+    },
+    onUncheckAll: function(row){
+
+    },
+    onPageChange: function(number, size){
+    	clickByDirOrPageButton = 0;
+    }
+});
+
+function fileTableType(value, row, index){
+   var result;
+   if(value == 0){
+	   result = '<img src="/static/img/opened_folder.png">'
+   }else{
+	   result = '<img src="/static/img/document.png">'
+   }
+   return result;
+}
+
+function fileTableName (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + row.file_id + ",'" + row.name + "')\" target=\"_self\">" + row.name + "</a>";
+   }else{
+      result = row.name;
+   }
+   
+   return result;
+}
+
+function fileTableSize (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "--";
+   }else{
+      result = unitConversion(row.size);
+   }
+   return result;
+}
+
+function setFileId(id, name){
+	   file_id = id;
+	   clickByDirOrPageButton = 1;
+	   //$fileTable.bootstrapTable("refresh");
+	   $fileTable.bootstrapTable('selectPage',1);
+	   
+	   //如果点击的是路径中存在的文件夹，则将其后的文件夹删除，当前文件夹的链接也取消
+	   for(var i = 0; i<path_arr.length; i++){
+	      if(path_arr[i].file_id == id){
+	         path_arr.splice(i+1, path_arr.length-(i+1));
+	         var urlObjLen = path_arr.length;
+	         var urlPath = "";
+	         if(urlObjLen == 1){
+		     	urlPath += path_arr[0].name;
+		     	$("#base-path").html(urlPath);
+	         }else if(urlObjLen > 1){
+		        for(var i = 0; i < (urlObjLen-1); i++){
+			    	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+			    }
+		        urlPath += path_arr[urlObjLen-1].name;
+		        $("#base-path").html(urlPath);
+	         }
+	         return;
+	      }
+	   }
+	   
+	   //点击的如果是表格中的文件夹，则将该文件夹添加至路径末尾
+	   path_arr.push({'file_id': id, 'name': name});
+	   var urlObjLen = path_arr.length;
+	   var urlPath = "";
+	   if(urlObjLen == 1){
+	     	urlPath += path_arr[0].name;
+	     	$("#base-path").html(urlPath); 
+	   }else if(urlObjLen > 1){
+		   for(var i = 0; i < (urlObjLen-1); i++){
+		   	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+		   }
+	       urlPath += path_arr[urlObjLen-1].name;
+	       $("#base-path").html(urlPath);
+	   }  
+}
+
+/**
+ * 模块：新建文件夹
+ */
+ 
+$("#new-folder-button").click(function(){
+    $("#new-dir-modal").modal("show");
+});
+
+$('#new-dir-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	newDirModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）.\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线 、  . 或中英文括号'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var params = JSON.stringify({file_name: $("#new-dir-modal-name").val(), file_pid: file_id});
+	console.log("新建文件夹时传给后台的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/general-storage/create-dir/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("新建文件夹时后台返回的参数：");
+			console.log(data);
+			if(data.ret){
+				$("#new-dir-modal-form")[0].reset();
+				$("#new-dir-modal-form").data('bootstrapValidator').resetForm();
+				$("#new-dir-modal").modal("hide");
+				toastr.success("创建文件夹成功", "成功提示");
+				$fileTable .bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：下载
+ */
+ 
+$("#download-button").click(function(){
+    var checkedFiles = $fileTable.bootstrapTable('getSelections');
+    var len = checkedFiles.length;
+
+    if(len > 0){
+    	for(var i = 0; i<len; i++){
+    	  if(Number(checkedFiles[i].file_type) == 0){
+      		  toastr.error("不能下载文件夹：" + checkedFiles[i].name, "错误提示");
+      	  }else{
+       		  var iframe = document.createElement("iframe");
+       		  iframe.style.display = "none"; // 防止影响页面
+       		  iframe.style.height = 0; // 防止影响页面
+       		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFiles[i].file_id; 
+       		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+       		  // 5分钟之后删除
+       		  setTimeout(function(){
+       		    iframe.remove();
+       		  }, 5 * 60 * 1000);
+      	  }
+    	}
+    }else{
+        toastr.error("请选择需要下载的文件", "错误提示");
+    }
+});
+
+/**
+ * 模块：删除
+ */
+ 
+$("#delete-button").click(function(){
+    var checkedFiles = $fileTable.bootstrapTable('getSelections');
+    var len = checkedFiles.length;
+    var currentPageDataLen = $fileTable.bootstrapTable('getData').length;//当前页数据条数
+    if(len == 0){
+        toastr.error("请选择需要删除的文件或文件夹", "错误提示");
+    }else if(len > 0){
+    	var file_ids = [];
+    	for(var i = 0; i < len; i++){
+    		file_ids.push(checkedFiles[i].file_id);
+    	}
+    	
+    	var parmars = JSON.stringify({"file_ids": file_ids});
+    	console.log("删除多个文件时传给后台的参数");
+    	console.log(parmars);
+    	
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/general-storage/remove-many/',
+			data: parmars,
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("删除文件提交数据成功时后台返回的参数：");
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除文件成功", "成功提示");
+					var totalRows = Number($("#bootstrapTableTotalRows").text());
+	            	var totalPages = Math.ceil(totalRows/thisPageSize);
+					if(thisPage == totalPages){
+		            	if(len < currentPageDataLen){
+		            		$fileTable.bootstrapTable("refresh");
+		            	}else if(len == currentPageDataLen){
+		            		$fileTable.bootstrapTable('prevPage');
+		            	}
+					}else{
+						$fileTable.bootstrapTable("refresh");
+					}
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+    }
+});
+
+/**
+ * 模块：重置表单
+ */
+ 
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+}
+
+/**
+ * 文件大小单位转换(输入为B)
+ */
+function unitConversion(size){
+	if(size >= 1024 && size < (1024*1024)){
+		size = (size/1024).toFixed(2) + "K";
+	}else if(size >= (1024*1024) && size < (1024*1024*1024)){
+		size = (size/(1024*1024)).toFixed(2) + "M";
+	}else if(size >= (1024*1024*1024) && size < (1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024)).toFixed(2) + "G";
+	}else if(size >= (1024*1024*1024*1024) && size < (1024*1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024*1024)).toFixed(2) + "T";
+	}else{
+		size += "B";
+	}
+	return size;
+}
+</script>
+
+</body>
+</html>

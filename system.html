@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>系统管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/alertify.js-0.3.11/themes/alertify.core.css" type="text/css">
+<link rel="stylesheet" href="/static/libs/alertify.js-0.3.11/themes/alertify.bootstrap.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+      <div class="main-right-in">
+      
+			<!-- =============================================== // content begin ====================================================== -->
+			<!-- // main begin -->
+			<table width="100%" class="table table-bordered table-striped">
+				<tbody>
+				  <tr>
+				    <td width="20%" align="left" valign="top" style="padding-left: 10px;">
+						是否开启网盘服务功能：
+				    </td>
+				    <td align="left" style="padding-left: 25px;">
+						<input type="checkbox" value="" id="start-or-stop-server" style="cursor: pointer"/>
+				    </td>
+				  </tr>
+				  
+				  <tr>
+				    <td width="20%" align="left" valign="top" style="padding-left: 10px;">
+						是否启用外链：
+				    </td>
+				    <td align="left" style="padding-left: 25px;">
+						<input type="checkbox" value="" id="start-exlinks-or-not" style="cursor: pointer"/>
+				    </td>
+				  </tr>
+				  
+				  <tr>
+				    <td width="20%" align="left" valign="top" style="padding-left: 10px; line-height: 32px;">
+						数据管理：
+				    </td>
+				    <td align="left">
+						<a class="btn btn-success btn-sm" style="text-decoration: none; margin-left: 15px;" id="copy">
+						     	<i class="glyphicon glyphicon-log-out"></i>
+						     	<span>&nbsp;导出</span>
+						</a>
+							
+						<a class="btn btn-success btn-sm" style="text-decoration: none; margin-left: 20px;" id="restore">
+					     	<i class="glyphicon glyphicon-log-in"></i>
+					     	<span>&nbsp;导入</span>
+						</a>
+				    </td>
+				  </tr>
+				  
+				  <tr>
+				    <td width="20%" align="left" valign="top" style="padding-left: 10px;">
+						密级设置：
+				    </td>
+				    <td align="left" style="padding-left: 25px;">
+							<!-- // 密级设置  begin -->
+								<div class="botton-panel" id="server-table-toolbar">
+									<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" data-toggle="modal" id="create-secret-level-button">
+								    	<i class="glyphicon glyphicon-folder-open"></i>
+								    	<span>&nbsp;创建</span>    
+								    </a>
+								    
+								    <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="edit-secret-level-button">
+								    	<i class="glyphicon glyphicon-pencil"></i>
+								    	<span>编辑</span>   
+								    </a>
+								    
+								    <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="delete-secret-level-button">
+								    	<i class="glyphicon glyphicon-minus"></i>
+								    	<span>删除</span>    
+								    </a>
+								</div>
+				
+								<table id="secret-level-set-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+								
+								</table>
+							<!-- 密级设置  end // -->
+				    </td>
+				  </tr>
+				 </tbody>
+			</table>
+			<!-- main end // -->
+			<!-- =============================================== content end // ====================================================== -->
+
+      </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // modal begin ====================================================== -->
+<!-- // restore begin -->
+<div class="modal fade" id="restore-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearRestoreModalValidate()">
+							×						</button>
+						<h4 class="modal-title">导入 </h4>
+					</div>
+					<form id="restore-modal-form" method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">选择文件：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="file" class="form-control" id="restore-modal-file" name="copyModalFile" placeholder="" />
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="restore-modal-form-submit" type="button">确 定</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearRestoreModalValidate()">取 消</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- restore end // -->
+
+<!-- // create secret level begin -->
+<div class="modal fade" id="create-secret-level-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('create-secret-level-modal-form')">
+							×						</button>
+						<h4 class="modal-title">创建密级 </h4>
+					</div>
+					<form id="create-secret-level-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">等级：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <input id="create-secret-level-modal-level" name="createSecretLevelModalLevel" class="form-control" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="create-secret-level-modal-name" name="createSecretLevelModalName" placeholder="" />
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="create-secret-level-modal-submit" type="submit">
+							确 定						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('create-secret-level-modal-form')">
+							取 消						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- create secret level end // -->
+
+<!-- // edit secret level begin -->
+<div class="modal fade" id="edit-secret-level-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('edit-secret-level-modal-form')">
+							×						</button>
+						<h4 class="modal-title">编辑密级 </h4>
+					</div>
+					<form id="edit-secret-level-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+                        <input type="hidden" id="edit-secret-level-modal-id" />
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">等级：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <input id="edit-secret-level-modal-level" name="editSecretLevelModalLevel" class="form-control" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-secret-level-modal-name" name="editSecretLevelModalName" placeholder="" />
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="edit-secret-level-modal-submit" type="submit">
+							确 定						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('edit-secret-level-modal-form')">
+							取 消						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- edit secret level end // -->
+
+{% include "dist/change-password.html" %}
+<!-- =============================================== modal end // ====================================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/alertify.js-0.3.11/lib/alertify.min.js"></script>
+
+<script src="/static/libs/sha1.js"></script>
+<script>
+function clearRestoreModalValidate(){
+	document.getElementById("restore-modal-file").value = "";
+}
+
+/**
+ * 功能： 初始化确认框
+ */
+
+function alertifyReset() {
+	alertify.set({
+	   labels : {
+	     ok   : "确认",
+	     cancel : "取消"
+	   },
+	   delay : 5000,
+	   buttonReverse : true,
+	   buttonFocus  : "ok"
+	});
+};
+
+alertifyReset();
+
+/**
+ * 模块：启停网盘
+ */
+ 
+//获取启停网盘服务和是否启用外链状态
+$.ajax({
+    type: "GET",
+    url: '/kscd/api/system-manage/get-system-status/',
+    data: {},
+    dataType: "json",
+    success: function(data){
+    	console.log('获取启停网盘服务功能和是否启用外链状态：');
+    	console.log(data);
+    	if(data.ret){
+    		//$("#start-or-stop-server").prop("checked", true);
+    		if(data.status.webdiskservice_status == "start"){
+    			$("#start-or-stop-server").prop("checked", true);
+    		}else if(data.status.webdiskservice_status == "stop"){
+    			$("#start-or-stop-server").prop("checked", false);
+    		}
+    		
+    		if(data.status.external_link_status == "start"){
+    			$("#start-exlinks-or-not").prop("checked", true);
+    		}else if(data.status.webdiskservice_status == "stop"){
+    			$("#start-exlinks-or-not").prop("checked", false);
+    		}
+    	}else{
+    		toastr.error(data.msg, "错误提示");
+    	}
+    },
+    error: function(data){
+    	toastr.error("连接失败", "错误提示");
+    }
+});
+
+//启停网盘服务
+$("#start-or-stop-server").click(function(e){
+	e.preventDefault();
+	
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+				
+					var status;
+					var message;
+					if($("#start-or-stop-server").is(":checked")){
+						message = "确定关闭网盘服务功能？";
+					}else{
+						message = "确定开启网盘服务功能？";
+					}
+				
+					// confirm dialog
+					alertify.confirm(message, function (e) {
+					    if (e) {
+					        // user clicked "ok"
+							if($("#start-or-stop-server").is(":checked")){
+								$("#start-or-stop-server").prop("checked",false);
+								status = false;
+							}else{
+								$("#start-or-stop-server").prop("checked",true);
+								status = true;
+							}
+							
+							var params = JSON.stringify({"start": status});
+							console.log("是否开启网盘服务功能时传给后台的参数：");
+							console.log(params);
+						    $.ajax({
+						        type: "POST",
+						        url: '/kscd/api/system-manage/web-disk-service/',
+						        data: params,
+						        dataType: "json",
+						        success: function(data){
+						        	console.log('设置启停网盘服务功能时后台返回的数据：');
+						        	console.log(data);
+						        	if(data.ret != true){
+						        		toastr.error(data.msg, "错误提示");
+						        	}
+						        },
+						        error: function(data){
+						        	toastr.error("连接失败", "错误提示");
+						        }
+						    });
+					    } else {
+					        // user clicked "cancel"
+
+					    }
+					});
+				//end
+			}else{
+				toastr.error('对不起，您没有权限开启或关闭网盘服务功能', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/*
+ * 模块：是否启用外链
+ */
+$("#start-exlinks-or-not").click(function(e){
+	e.preventDefault();
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+					var status;
+					var message;
+					if($("#start-exlinks-or-not").is(":checked")){
+						message = "确定关闭外链功能？";
+					}else{
+						message = "确定启用外链功能？";
+					}
+					
+					// confirm dialog
+					alertify.confirm(message, function (e) {
+					    if (e) {
+							if($("#start-exlinks-or-not").is(":checked")){
+								$("#start-exlinks-or-not").prop("checked",false);
+								status = false;
+							}else{
+								$("#start-exlinks-or-not").prop("checked",true);
+								status = true;
+							}
+							
+							var params = JSON.stringify({"enable": status});
+							console.log("是否启用外链时传给后台的参数：");
+							console.log(params);
+						    $.ajax({
+						        type: "POST",
+						        url: '/kscd/api/system-manage/set-exlinks/',
+						        data: params,
+						        dataType: "json",
+						        success: function(data){
+						        	console.log('外链设置时后台返回的数据：');
+						        	console.log(data);
+						        	if(data.ret != true){
+						        		toastr.error(data.msg, "错误提示");
+						        	}
+						        },
+						        error: function(data){
+						        	toastr.error("连接失败", "错误提示");
+						        }
+						    });
+					    } else {
+					        // user clicked "cancel"
+
+					    }
+					});
+				//end
+			}else{
+				toastr.error('对不起，您没有权限开启或关闭外链功能', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：恢复和备份数据
+ */
+ 
+// 恢复
+$("#restore").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				$("#restore-modal").modal("show");
+			}else{
+				toastr.error('对不起，您没有恢复权限', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+	
+});
+
+$("#restore-modal-form-submit").click(function () {
+	try{
+		var fileName = document.getElementById("restore-modal-file").files[0];
+		console.log(fileName);
+		if(fileName.name.indexOf(".sql") < 0){
+			toastr.error("只能导入.sql文件", "错误提示");
+			return;
+		}
+	}catch(err){
+		toastr.error("请导入一个.sql文件", "错误提示");
+		return;
+	}
+	
+	toastr.info("此过程耗时大约需十秒（具体以实际为准），请耐心等待", "信息提示");
+	
+    //$("#imgWait").show();
+    var formData = new FormData();
+    formData.append("myfile", document.getElementById("restore-modal-file").files[0]);   
+    $.ajax({
+        url: "/kscd/api/system-manage/import-metadata/",
+        type: "POST",
+        data: formData,
+        /**
+        *必须false才会自动加上正确的Content-Type
+        */
+        contentType: false,
+        /**
+        * 必须false才会避开jQuery对 formdata 的默认处理
+        * XMLHttpRequest会对 formdata 进行正确的处理
+        */
+        processData: false,
+        success: function (data) {
+        	console.log("上传文件时后台返回的所有数据：");
+        	console.log(data);
+            if(JSON.parse(data).ret == true){
+                toastr.success("恢复成功", "成功提示");
+                document.getElementById("restore-modal-file").value = "";
+                $("#restore-modal").modal("hide");
+            }else{
+            	toastr.error(JSON.parse(data).msg, "错误提示");
+            }
+            //$("#imgWait").hide();
+        },
+        error: function () {
+        	toastr.error("连接错误");
+            //$("#imgWait").hide();
+        }
+    });
+});
+
+// 备份
+$("#copy").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+				  var iframe = document.createElement("iframe");
+		  		  iframe.style.display = "none"; // 防止影响页面
+		  		  iframe.style.height = 0; // 防止影响页面
+		  		  iframe.src = '/kscd/api/system-manage/export-metadata/'; 
+		  		  document.body.appendChild(iframe);
+		  		  // 5分钟之后删除
+		  		  setTimeout(function(){
+		  		    iframe.remove();
+		  		  }, 5 * 60 * 1000);
+				// end
+			}else{
+				toastr.error('对不起，您没有备份权限', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：密级设置
+ */
+ 
+// 获取密级列表
+var $secretLevelSetTable = $('#secret-level-set-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/system-manage/seclevel/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'id',
+    striped: false,
+    cache: false,
+	sortName: 'seclevel',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: true,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#server-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder
+        };
+        console.log("获取密级列表时传给后台的参数：");
+		console.log(params);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'seclevel',
+	        title:'等级',
+	        valign: 'middle',
+	        width: '16%',
+	        sortable: true
+        },{
+	        field: 'name',
+	        title:'名称'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+        toastr.error("数据加载失败！", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+//创建密级
+$("#create-secret-level-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+				$("#create-secret-level-modal").modal("show");
+				// end
+			}else{
+				toastr.error('对不起，您没有权限创建密级', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+$('#create-secret-level-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	createSecretLevelModalLevel: {
+            message: '等级无效',
+            validators: {
+                notEmpty: {
+                    message: '等级不能为空'
+                },
+				regexp : {
+					regexp : /^((0)|([1-9][0-9]*))$/,
+					message : '等级只能为0或正整数'
+				}
+            }
+        },
+        createSecretLevelModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字或下滑线'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var level = $("#create-secret-level-modal-level").val();
+	var name = $("#create-secret-level-modal-name").val();
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/system-manage/seclevel/',
+		data: JSON.stringify({"seclevel" : level, "secname": name}),
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("创建密级时返回的所有信息：");
+			console.log(data);
+			if(data.ret){
+				$("#create-secret-level-modal-form")[0].reset();
+				$("#create-secret-level-modal-form").data('bootstrapValidator').resetForm();
+				$("#create-secret-level-modal").modal("hide");
+				toastr.success("创建成功", "成功提示");
+				$secretLevelSetTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+//编辑密级
+$("#edit-secret-level-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+				var checkedSecretLevel = $secretLevelSetTable.bootstrapTable('getSelections');
+				console.log(checkedSecretLevel);
+				var len = checkedSecretLevel.length;
+				if(len == 0){
+					toastr.error("请选择需要编辑的密级", "错误提示");
+				}else if(len == 1){
+					$("#edit-secret-level-modal").modal("show");
+					$("#edit-secret-level-modal-level").val(checkedSecretLevel[0].seclevel);
+					$("#edit-secret-level-modal-name").val(checkedSecretLevel[0].name);
+				}else if(len > 1){
+					toastr.error("一次只能编辑的一个密级设置", "错误提示");
+				}
+				// end
+			}else{
+				toastr.error('对不起，您没有权限编辑密级', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+$('#edit-secret-level-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	editSecretLevelModalLevel: {
+            message: '等级无效',
+            validators: {
+                notEmpty: {
+                    message: '等级不能为空'
+                },
+				regexp : {
+					regexp : /^((0)|([1-9][0-9]*))$/,
+					message : '等级只能为0或正整数'
+				}
+            }
+        },
+        editSecretLevelModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字或下滑线'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	//修改存储器信息：管理员能够修改存储服务器的 IP、存储服务器名称
+	//param id: 被修改的存储器id
+	var level = $("#edit-secret-level-modal-level").val();
+	var name = $("#edit-secret-level-modal-name").val();
+	var checkedItem = $secretLevelSetTable.bootstrapTable('getSelections');
+	$.ajax({
+		type: "PATCH",
+		url: '/kscd/api/system-manage/seclevel/' + checkedItem[0].id + "/",
+		data: JSON.stringify({seclevel: level, secname: name}),
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("编辑密级时返回的所有信息：");
+			console.log(data);
+			if(data.ret){
+				$("#edit-secret-level-modal-form")[0].reset();
+				$("#edit-secret-level-modal-form").data('bootstrapValidator').resetForm();
+				$("#edit-secret-level-modal").modal("hide");
+				toastr.success("编辑成功", "成功提示");
+				$secretLevelSetTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+//删除密级
+function deleteSecretLevel(){
+	var checkedSecretLevel = $secretLevelSetTable.bootstrapTable('getSelections');
+	console.log(checkedSecretLevel);
+	var len = checkedSecretLevel.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要删除的密级设置项", "错误提示");
+	}else if(len == 1){
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/system-manage/seclevel/' + checkedSecretLevel[0].id + "/",
+			data: {},
+			dataType: "json",
+			success: function(data){
+				console.log("删除密级设置项时后台返回的数据");
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除密级设置项成功", "成功提示");
+					$secretLevelSetTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}else if(len > 1){
+		toastr.error("一次只能删除一项密级设置项", "错误提示");
+	}
+}
+
+$("#delete-secret-level-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				alertify.confirm("确认删除吗？如果删除，个人空间相应密级将会置为null", function (e) {
+					if (e) {
+						// user clicked "ok"
+						deleteSecretLevel();
+					} else {
+						// user clicked "cancel"
+					}
+				});
+				
+			}else{
+				toastr.error('对不起，您没有权限删除已设置的密级', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+function clearValidate(formId){
+	$("#" + formId)[0].reset()
+    $("#" + formId).data('bootstrapValidator').resetForm();
+}
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

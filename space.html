@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>个人空间</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<link rel="stylesheet" href="/static/libs/lou-multi-select-e052211/css/multi-select.css" type="text/css">
+<link rel="stylesheet" href="/static/libs/webuploader/webuploader.css" type="text/css">
+<style>
+.ms-container{
+	margin: 0 auto;
+}
+</style>
+</head>
+
+<body>
+{% include "dist/head-user.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+	   <li><a href="/kscd/general-storage/" target="_self" class="main-left-menu-active"><span class="fa fa-user" aria-hidden="true"></span> &nbsp;个人空间</a></li>
+<!--        <li><a href="/kscd/secret-storage/" target="_self"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> 私密空间</a></li> -->
+       <li><a href="/kscd/external-link/" target="_self"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 我的外链</a></li>
+       <li><a href="/kscd/myshare/" target="_self"><span class="fa fa-users" aria-hidden="true"></span> 我的共享</a></li>
+       <li><a href="/kscd/receive-share/" target="_self"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> 收到的共享 <span class="badge" id="share-numbers"></span></a></li>
+       <li><a href="/kscd/recycle/" target="_self"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 回收站</a></li>
+    </ul>
+       
+{% include "dist/capacity-user.html" %}
+       
+</div>
+<!-- left menu end // -->
+
+<!-- //right begin -->
+<div class="main-right">
+	<div class="main-right-in">
+      
+		<!-- =============================================== // content begin ====================================================== -->
+		
+		<div id="upload-file-container">
+			<div id="upload-file-container-tools">
+				<b style="float: left; padding-left: 10px;">文件上传</b>
+				<button class="btn btn-action" title="最小化" id="upload-file-container-tools-down"><i class="glyphicon glyphicon-triangle-bottom" style="color: #000000"></i></button>
+				<button class="btn btn-action" title="最大化" id="upload-file-container-tools-up"><i class="glyphicon glyphicon-triangle-top" style="color: #000000"></i></button>
+				<button class="btn btn-action" title="关闭" id="upload-file-container-tools-close"><i class="glyphicon glyphicon-remove" style="color: #000000"></i></button>
+			</div>
+		
+			<!-- // 断点续传   begin -->
+			<!-- 隐藏域 实时保存上传进度 -->
+			<input id="progress-bar" type="hidden"/>
+			<div id="uploader" class="wu-example" style="position: relative;">
+			    <label class="text-right" style="font-weight:100;float:left;margin-left:10px;"></label>
+			    <div class="btns">
+			    <div id="picker" class="webuploader-container">
+			        <div class="webuploader-pick">选择文件</div>
+			        <div id="rt_rt_1bchdejhrarjdvd11h41eoh1nt1" style="position: absolute; top: 0px; left: 0px; width: 88px; height: 35px; overflow: hidden; bottom: auto; right: auto;">
+			            <input id="file_bp" name="file" class="webuploader-element-invisible" type="file" />
+			            <label style="opacity: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: rgb(255, 255, 255) none repeat scroll 0% 0%;"></label>
+			        </div>
+			    </div>
+			    
+			    <button class="btn m-b-xs btn-sm btn-info btn-addon" id="startOrStopBtn" style="margin-top:20px; position: absolute;top: -20px; left: 100px;display: none;">开始上传</button>
+			    
+			    <div style="height: 10px;"></div>
+			    
+			    <!-- 文件列表：选择文件后在该div显示 -->
+			    <div id="thelist" class="uploader-list list-group-item clearfix ng-hide" style="margin-left:10px;"></div>
+				<!-- <label class="text-right" style="font-weight:100;float:left;margin-left:15px;width:144px;margin-right:15px;"></label> -->
+			    </div>
+			</div>
+			<!-- 断点续传   end // -->
+		
+		</div>
+		
+		<div class="botton-panel" id="file-table-toolbar">
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="upload-file-button">
+				<i class="glyphicon glyphicon-open"></i>
+				<span>上传文件</span>
+			</a>
+			
+			<!--[if IE]>
+				<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="upload-file-button-for-ie">
+					<i class="glyphicon glyphicon-open"></i>
+					<span>IE8不支持断点续传</span>
+				</a>
+			<![endif]-->
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="new-folder-button">
+				<i class="glyphicon glyphicon-folder-open"></i>
+				<span> &nbsp;&nbsp;新建文件夹</span>
+			</a>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="create-exlinks-button">
+				<i class="glyphicon glyphicon-link"></i>
+				<span>创建外链</span>
+			</a>
+		
+			<div class="btn-group" role="group" id="share-button" style="display: none;">
+				<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					共享给
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" id="share-to-user-button">用户</a></li>
+					<li><a href="#" id="share-to-group-button">共享组</a></li>
+					<li><a href="#" id="share-to-department-button">部门</a></li>
+				</ul>
+			</div>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="download-button">
+				<i class="glyphicon glyphicon-download-alt"></i>
+				<span>下载</span>
+			</a>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="delete-button">
+				<i class="glyphicon glyphicon-minus"></i>
+				<span>删除</span>
+			</a>
+		
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;display: none;" id="rename-button">
+				<i class="glyphicon glyphicon-pencil"></i>
+				<span>重命名</span>
+			</a>
+		
+			<div class="btn-group" role="group" id="move-to-button" style="display: none;">
+				<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					移动到
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" id="move-to-space-button">个人空间</a></li>
+					<!-- <li><a href="#" id="move-to-private-button">私密空间</a></li> -->
+				</ul>
+			</div>
+		
+			<div class="btn-group" role="group" id="copy-to-button" style="display: none;">
+				<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					复制到
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" id="copy-to-space-button">个人空间</a></li>
+					<!-- <li><a href="#" id="copy-to-private-button">私密空间</a></li> -->
+				</ul>
+			</div>
+		</div>
+		
+		<div class="base-path">当前路径：<span id="base-path">根文件夹</span></div>
+		
+		<!-- // main begin -->
+		<div id="file-table-contain" style="overflow: auto;">
+			<table id="file-table" data-toggle="table" class="table table-bordered table-striped" style="border: 1px solid #d4d8da;z-index: -1;">
+			
+			</table>
+		</div>
+		<!-- main end // -->
+		
+		<!-- =============================================== content end // ====================================================== -->
+
+	</div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+<div class="modal fade" id="new-dir-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="clearValidate('new-dir-modal-form');">
+					×
+				</button>
+				<h4 class="modal-title">新建文件夹</h4>
+			</div>
+			<form id="new-dir-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<div class="form-group">
+						<label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+						<div class="col-lg-5 col-md-5 col-sm-5">
+							<input type="text" class="form-control" id="new-dir-modal-name" name="newDirModalName" value=""/>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+							<div class="checkbox">
+
+							</div>
+						</div>
+					</div>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="new-dir-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="clearValidate('new-dir-modal-form');">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<div class="modal fade" id="create-exlink-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="resetCreateExlinkModalForm()">
+					×
+				</button>
+				<h4 class="modal-title"> 分享文件(夹)</h4>
+			</div>
+			<form id="create-exlink-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<div class="form-group">
+						<label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">有效期：</label>
+						<div class="col-lg-5 col-md-5 col-sm-5" style="padding-top: 6px;">
+							<label class = "radioCheckboxLabel" style="margin-right: 15px;"><input type="radio" name="createExlinkModalValidity" value="forever" checked> 永久有效</label>
+							<label class = "radioCheckboxLabel" style="margin-right: 15px;"><input type="radio" name="createExlinkModalValidity" value="sevenDays"> 七天</label>
+							<label class = "radioCheckboxLabel"><input type="radio" name="createExlinkModalValidity" value="oneDay"> 一天</label>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+							<div class="checkbox">
+
+							</div>
+						</div>
+					</div>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="create-exlink-modal-submit" type="submit">
+						创建
+					</button>
+					
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="resetCreateExlinkModalForm()">
+						关 闭
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title"> 分享文件(夹)</h4>
+			</div>
+			<form id="share-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body" style="position: relative;">
+					<!-- // modal-body begin -->
+
+					<div class="form-group">
+						<div class="col-lg-12 col-md-12 col-sm-12">
+							<input type="text" class="form-control" id="share-modal-url" name="shareModalUrl" value="" style="padding-left: 5px;padding-right: 5px;"/>
+						</div>
+					</div>
+
+					<div class="form-group" style="position: absolute; left: 0; top: 0; z-index: -1000000;">
+						<div class="col-lg-12 col-md-12 col-sm-12">
+							<input type="text" class="form-control" id="share-modal-url-code" name="shareModalUrlCode" value="" style="padding-left: 0;padding-right: 0;"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal">提取码：</label>
+						<div class="col-lg-1 col-md-1 col-sm-1" style="padding-left: 0; padding-right: 0;">
+							<input type="text" class="form-control" id="share-modal-code" name="shareModalCode" value="" style="padding-left: 2px;padding-right: 2px;"/>
+						</div>
+						<label class="col-lg-2 col-md-2 col-sm-2 control-label font-normal" style="padding-left: 0;">失效时间：</label>
+						<div class="col-lg-4 col-md-4 col-sm-4" style="padding-left:0;">
+							<input type="text" class="form-control" id="share-modal-expire-time" name="shareModalExpireTime" value="" style="padding-left: 5px;padding-right: 5px;"/>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 align-right" style="padding-left: 0;">
+							<button class="btn btn-success" id="share-modal-copy-button" type="button" onclick="copyForClick();" style="margin-right: 20px;">
+								复制链接及提取码
+							</button>
+						</div>
+					</div>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" type="button" data-dismiss="modal" >
+						关 闭
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- 共享给用户 -->
+<div class="modal fade" id="share-to-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">共享给用户（点击选择，左侧为未选择，右侧为已选择）</h4>
+			</div>
+			<form id="share-to-user-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<select id='share-to-user-modal-pre-selected-options' multiple='multiple'>
+
+					</select>
+
+					<!-- // modal-body end -->
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-success" id="share-to-user-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- 共享给共享组-->
+<div class="modal fade" id="share-to-group-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">共享给共享组</h4>
+			</div>
+			<form id="share-to-group-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+					
+					<!-- // left table begin -->
+			    		<ul id="share-to-group-modal-tree" class="ztree" style="max-height: 260px; overflow: auto;"></ul>
+			    	<!-- // left table end -->
+
+					<!-- // modal-body end -->
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-success" id="share-to-group-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 共享给部门 -->
+<div class="modal fade" id="share-to-department-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">共享给部门</h4>
+			</div>
+			<form id="share-to-department-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<ul id="share-to-department-modal-tree" class="ztree" style="max-height: 260px; overflow: auto;"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="share-to-department-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 重命名 -->
+<div class="modal fade" id="rename-file-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="clearValidate('rename-file-modal-form')">
+					×
+				</button>
+				<h4 class="modal-title">重命名</h4>
+			</div>
+			<form id="rename-file-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+					
+					<input type="hidden" class="form-control" id="rename-file-modal-file-id" name="renameFileModalFileId" value=""/>
+
+					<div class="form-group">
+						<label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right" id="rename-file-modal-choice-file-type">名：</label>
+						<div class="col-lg-5 col-md-5 col-sm-5">
+							<input type="text" class="form-control" id="rename-file-modal-name" name="renameFileModalName" value="" />
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+
+						</div>
+					</div>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="rename-file-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="clearValidate('rename-file-modal-form')">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 移动到个人空间 -->
+<div class="modal fade" id="move-to-space-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="initFilePidForMoveToSpace();">
+					×
+				</button>
+				<h4 class="modal-title">移动到个人空间</h4>
+			</div>
+			<form id="move-to-space-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<ul id="move-to-space-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="move-to-space-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="initFilePidForMoveToSpace();">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 移动到私密空间 -->
+<div class="modal fade" id="move-to-private-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">移动到私密空间</h4>
+			</div>
+			<form id="move-to-private-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<ul id="move-to-private-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 复制到个人空间 -->
+<div class="modal fade" id="copy-to-space-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="initFilePidForCopyToSpace();">
+					×
+				</button>
+				<h4 class="modal-title">复制到个人空间</h4>
+			</div>
+			<form id="copy-to-space-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<ul id="copy-to-space-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="copy-to-space-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal" onclick="initFilePidForCopyToSpace();">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 复制到私密空间 -->
+<div class="modal fade" id="copy-to-private-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title">复制到私密空间</h4>
+			</div>
+			<form id="copy-to-private-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+
+					<ul id="copy-to-private-modal-tree" class="ztree"></ul>
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="add-user-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+<!-- // 修改密级 -->
+<div class="modal fade" id="modify-security-level-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					×
+				</button>
+				<h4 class="modal-title" id="modify-security-level-modal-title">修改密级</h4>
+			</div>
+			<form id="modify-security-level-modal-form" method="post" class="form-horizontal" action="">
+				<div class="modal-body">
+					<!-- // modal-body begin -->
+					
+						<input type="hidden" value="" id="modify-security-level-modal-hidden"/>						
+					    <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">密级：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+								<select name="modifySecurityLevelModalName" id="modify-security-level-modal-name" class="form-control">
+
+								</select>
+                            </div>
+                        </div>
+
+
+
+					<!-- // modal-body end -->
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" id="modify-security-level-modal-submit" type="submit">
+						确 定
+					</button>
+					<button class="btn btn-default" type="button" data-dismiss="modal">
+						取 消
+					</button>
+				</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div>
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/lou-multi-select-e052211/js/jquery.multi-select.js"></script>
+<script src="/static/libs/webuploader/webuploader.min.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script type="text/javascript">
+/**
+ * 功能： 初始化参数
+ */
+var file_id = 1; //初始化当前文件夹，1为根目录
+var path_arr = [{file_id: 1, name: '根文件夹'}]; //初始化路径
+var clickByDirOrPageButton = 0; // 判断用户点击的是文件夹链接还是分页按钮(或每页显示数下拉框)， 1表示文件夹链接，0为分页按钮/每页显示数下拉框
+var thisPage; //当前页码
+var thisPageSize; //当前每页条数
+
+/**
+ * 模块：文件上传
+ */
+
+/*******************初始化参数*********************************/
+var $list = $('#thelist'); //文件列表
+var $btn = $('#startOrStopBtn'); //开始上传按钮
+var state = 'pending'; //初始按钮状态
+var uploader; //uploader对象
+var fileMd5; //文件唯一标识
+
+/******************下面的参数是自定义的*************************/
+var fileName; //文件名称
+var fileSize;
+var oldProgress; //如果该文件之前上传过 已经上传的进度是多少
+var count = 0; //当前正在上传的文件在数组中的下标，一次上传多个文件时使用
+var filesArr = new Array(); //文件数组：每当有文件被添加进队列的时候 就push到数组中
+var map = {}; //key存储文件id，value存储该文件上传过的进度
+
+/***************************************************** 监听分块上传过程中的三个时间点 start ***********************************************************/
+WebUploader.Uploader.register({
+    "before-send-file":"beforeSendFile", //整个文件上传前
+    "before-send":"beforeSend", //每个分片上传前
+    "after-send-file":"afterSendFile", //分片上传完毕
+},
+{
+    //时间点1：所有分块进行上传之前调用此函数
+    beforeSendFile:function(file){
+        var deferred = WebUploader.Deferred();
+        //1、计算文件的唯一标记fileMd5，用于断点续传  如果.md5File(file)方法里只写一个file参数则计算MD5值会很慢 所以加了后面的参数：10*1024*1024
+        (new WebUploader.Uploader()).md5File(file,0,10*1024*1024).progress(function(percentage){
+            $('#'+file.id ).find('p.state').text('正在读取文件信息...');
+        })
+        .then(function(val){
+            $('#' + file.id ).find("p.state").text("成功获取文件信息...");
+            fileMd5 = val;
+            //获取文件信息后进入下一步
+            deferred.resolve();
+        });
+        
+        fileName = file.name; //为自定义参数文件名赋值
+ 		fileSize = file.size;
+        return deferred.promise();
+    },  
+    //时间点2：如果有分块上传，则每个分块上传之前调用此函数
+    beforeSend:function(block){
+        var deferred = WebUploader.Deferred();
+        $.ajax({
+            type:"POST",
+            url:"/kscd/api/general-storage/upload-file/check-chunk/", //ajax验证每一个分片
+            data:{
+                fileName: fileName,
+                jindutiao: $("#progress-bar").val(),
+                fileMd5: fileMd5, //文件唯一标记 
+                chunk: block.chunk, //当前分块下标
+                chunkSize: block.end-block.start //当前分块大小
+            },
+            cache: false,
+            async: false, // 与js同步
+            timeout: 1000, //todo 超时的话，只能认为该分片未上传过
+            dataType: "json",
+            success: function(response){
+                if(response.ifExist){
+                    //分块存在，跳过
+                    deferred.reject();
+                }else{
+                    //分块不存在或不完整，重新发送该分块内容
+                    deferred.resolve();
+                }
+            }
+        });
+                         
+        this.owner.options.formData.fileMd5 = fileMd5;
+        deferred.resolve();
+        return deferred.promise();
+    },
+    //时间点3：所有分块上传成功后调用此函数（每个文件）
+    afterSendFile:function(file){
+        //如果分块上传成功，则通知后台合并分块
+        $.ajax({
+            type: "POST",
+            url: "/kscd/api/general-storage/upload-file/merge-chunks/", //ajax将所有片段合并成整体
+            data: {
+                fileName: fileName,
+				fileSize: fileSize,
+                fileMd5: fileMd5,
+                filePid: file_id
+            },
+            dataType: "json",
+            success: function(data){
+            	setTimeout(function(){
+                    count++; //每上传完成一个文件 count+1
+                    if(count <= filesArr.length - 1){
+                        uploader.upload(filesArr[count].id); //上传文件列表中的下一个文件
+                    }
+                    
+                    console.log("判断分片是否接收完全：");
+                    console.log(data);
+                    
+                    //合并成功之后的操作
+                    if(data.ret){
+                   		$('#' + file.id).find('p.state').text('上传成功');
+                   		$fileTable.bootstrapTable("refresh");
+                   		getStorageSize();
+                   		hideToolbar();
+                    }else{
+                   	 	$('#' + file.id).find('p.state').text('上传失败，' + data.msg);
+                    }
+            	}, 500)
+            }  
+        });  
+    }  
+});
+/***************************************************** 监听分块上传过程中的三个时间点 end **************************************************************/
+
+/************************************************************ 初始化WebUploader start ******************************************************************/
+uploader = WebUploader.create({
+    auto: false, //选择文件后是否自动上传
+    chunked: true, //开启分片上传
+    chunkSize: 10*1024*1024, // 如果要分片，分多大一片？默认大小为5M
+    chunkRetry: 3, //如果某个分片由于网络问题出错，允许自动重传多少次
+    threads: 1, //上传并发数。允许同时最大上传进程数[默认值：3]
+    duplicate: true, //是否重复上传（同时选择多个一样的文件），true可以重复上传
+    prepareNextFile: true, //上传当前分片时预处理下一分片
+    swf: '/static/libs/webuploader/Uploader.swf', // swf文件路径
+    server: '/kscd/api/general-storage/upload-file/', // 文件接收服务端
+    fileSizeLimit: 5*1024*1024*1024, //5G 验证文件总大小是否超出限制, 超出则不允许加入队列
+    fileSingleSizeLimit: 3*1024*1024*1024, //3G 验证单个文件大小是否超出限制, 超出则不允许加入队列
+    pick: {
+            id: '#picker', //这个id是你要点击上传文件按钮的外层div的id
+            multiple : true //是否可以批量上传，true可以同时选择多个文件
+    },
+    resize: false, //不压缩image, 默认如果是jpeg，文件上传前会先压缩再上传！
+    accept: {
+        //允许上传的文件后缀，不带点，多个用逗号分割
+        extensions: "txt,jpg,jpeg,bmp,png,zip,rar,war,pdf,cebx,doc,docx,ppt,pptx,xls,xlsx",  
+        mimeTypes: '.txt,.jpg,.jpeg,.bmp,.png,.zip,.rar,.war,.pdf,.cebx,.doc,.docx,.ppt,.pptx,.xls,.xlsx',
+    }
+});
+/************************************************************ 初始化WebUploader end ********************************************************************/
+
+//当有文件被添加进队列的时候（点击上传文件按钮，弹出文件选择框，选择完文件点击确定后触发的事件）
+uploader.on('fileQueued', function(file) {
+    //限制单个文件的大小 超出了提示
+    if(file.size > 1*1024*1024*1024){
+        toastr.error("单个文件大小不能超过1G");
+        return false;
+    }
+    
+    /*************如果一次只能选择一个文件，再次选择替换前一个，就增加如下代码*******************************/
+    //清空文件队列
+    //$list.html("");
+    //清空文件数组
+    //filesArr=[];
+    /*************如果一次只能选择一个文件，再次选择替换前一个，就增加以上代码*******************************/
+    
+    //将选择的文件添加进文件数组
+    filesArr.push(file);
+		
+   	/*uploader.md5File( file ).progress(function(percentage) {
+           console.log('Percentage:', percentage);
+    }).then(function(val) {
+           console.log('md5 result:', val);
+    });*/
+
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/upload-file/selectProgressByFileName/", // 先检查该文件是否上传过，如果上传过，上传进度是多少
+        data: {
+            fileName: file.name, //文件名
+            fileMd5: fileMd5
+        },
+        cache: false,
+        async: false, // 同步
+        dataType: "json",
+        success: function(res){
+        	console.log(res);
+            //上传过
+            if(res.jindutiao > 0 && res.jindutiao < 1){
+                //上传过的进度的百分比
+                oldProgress = res.jindutiao/100;
+                //如果上传过 上传了多少
+                var progressBarStyle = "width:" + res.jindutiao + "%";
+                $list.append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">已上传' + res.jindutiao + '%</p>' +
+                    '<a href="javascript:void(0);" class="btnRemoveFile">删除</a>' +
+                        '<div class="progress progress-striped active" style="margin-bottom: 0;">' +
+                  '<div class="progress-bar" role="progressbar" style="' + progressBarStyle +'">' +
+                  '</div>' +
+                '</div>' +
+                '</div>');
+                //将上传过的进度存入map集合
+                map[file.id] = oldProgress;
+            }else if(res.jindutiao == 0){//没有上传过
+                $list.append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">等待上传...</p>' +
+                    '<a href="javascript:void(0);" class="btnRemoveFile">删除</a>' +
+                '</div>' );
+                $("#startOrStopBtn").show();
+            }else if(res.jindutiao == 1){
+            	toastr.error(file.name + "在当前目录中已经添加过", "错误提示");
+            }
+        }
+    });
+    uploader.stop(true);
+    //删除队列中的文件
+    $(".btnRemoveFile").bind("click", function() {
+        var fileItem = $(this).parent();
+        uploader.removeFile($(fileItem).attr("id"), true);
+        $(fileItem).fadeOut(function() {
+            $(fileItem).remove();
+        });
+    
+        //数组中的文件也要删除
+        var len = filesArr.length;
+        for(var i = 0; i < len; i++){
+            if(filesArr[i].id == $(fileItem).attr("id")){
+                filesArr.splice(i,1);//i是要删除的元素在数组中的下标，1代表从下标位置开始连续删除一个元素
+            }
+        }
+        
+        //当数组为0时，隐藏上传按钮
+        if(len == 0){
+        	$("#startOrStopBtn").hide();
+        }
+    });
+});
+     
+//文件上传过程中创建进度条实时显示
+uploader.on('uploadProgress', function(file, percentage) {
+    var $li = $( '#' + file.id ),
+    $percent = $li.find('.progress .progress-bar');
+    //避免重复创建
+    if (!$percent.length){
+        $percent = $('<div class="progress progress-striped active" style="margin-bottom: 0">' +
+          '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+          '</div>' +
+        '</div>').appendTo($li).find('.progress-bar');
+    }
+    
+    //将实时进度存入隐藏域
+    $("#progress-bar").val(Math.round(percentage * 100));
+    
+    //根据fielId获得当前要上传的文件的进度
+    var oldProgressValue = map[file.id];
+    
+    if(percentage < oldProgressValue && oldProgressValue != 1){
+        $li.find('p.state').text('上传中' + Math.round(oldProgressValue * 100) + '%');
+        $percent.css('width', oldProgressValue * 100 + '%');
+    }else{
+        $li.find('p.state').text('上传中' + Math.round(percentage * 100) + '%');
+        $percent.css('width', percentage * 100 + '%');
+    }
+});
+
+//上传成功后执行的方法（单个）
+uploader.on('uploadSuccess', function(file) {
+    //上传成功去掉进度条
+    $('#' + file.id).find('.progress').fadeOut();
+    //隐藏删除按钮
+    $(".btnRemoveFile").hide();
+    //隐藏上传按钮
+    $("#startOrStopBtn").hide();
+    $('#' + file.id).find('p.state').text('正在处理，请稍后...');
+});
+
+//上传出错后执行的方法
+uploader.on('uploadError', function(file) {
+    errorUpload = true;
+    $btn.text('开始上传');
+    uploader.stop(true);
+    $('#' + file.id).find('p.state').text('上传出错，请检查网络连接');
+});
+  
+//文件上传成功失败都会走这个方法
+uploader.on('uploadComplete', function(file) {
+
+});
+
+uploader.on('all', function(type){
+    if (type === 'startUpload'){
+        state = 'uploading';
+        $("#startOrStopBtn").show(); //开始上传，显示上传按钮 +
+    }else if(type === 'stopUpload'){
+        state = 'paused';
+        $("#startOrStopBtn").show(); //暂停，显示上传按钮 +
+    }else if(type === 'uploadFinished'){
+        state = 'done';
+        $("#startOrStopBtn").hide(); //上传完成，隐藏上传按钮 +
+    }
+
+    if (state === 'uploading'){
+        $btn.text('暂停上传');
+    } else {
+        $btn.text('开始上传');
+    }
+});
+
+//上传按钮的onclick时间
+$btn.on('click', function(){
+    if (state === 'uploading'){
+        uploader.stop(true);
+    } else {
+        //当前上传文件的文件名
+        var currentFileName;
+        //当前上传文件的文件id
+        var currentFileId;
+        //count=0 说明没开始传 默认从文件列表的第一个开始传
+        if(count == 0){
+            currentFileName = filesArr[0].name;
+            currentFileId = filesArr[0].id;
+        }else{
+            if(count <= filesArr.length-1){
+                currentFileName = filesArr[count].name;
+                currentFileId = filesArr[count].id;
+            }
+        }
+        
+        //先查询该文件是否上传过 如果上传过已经上传的进度是多少
+        $.ajax({
+            type: "POST",
+            url: "/kscd/api/general-storage/upload-file/selectProgressByFileName/",
+            data: {
+                fileName: currentFileName//文件名
+            },
+            cache: false,
+            async: false,  // 同步
+            dataType: "json",
+            success: function(res){
+                //如果上传过 将进度存入map
+                if(res.jindutiao > 0){
+                    map[currentFileId] = res.jindutiao/100;
+                }
+                //执行上传
+                uploader.upload(currentFileId);
+            }
+        });
+    }
+});
+
+//浏览器检测
+$("#upload-file-button").click(function(){
+	var mozilla = /firefox/.test(navigator.userAgent.toLowerCase());
+	var webkit = /webkit/.test(navigator.userAgent.toLowerCase());
+	var opera = /opera/.test(navigator.userAgent.toLowerCase());
+	var msie = /msie/.test(navigator.userAgent.toLowerCase());
+	//document.write(navigator.userAgent.toLowerCase());
+	
+	if(mozilla || webkit || opera){
+		$("#upload-file-container").animate({
+		    bottom: 0
+		});
+		$("#upload-file-container-tools-up").hide();
+		$("#upload-file-container-tools-down").show();
+	}else{
+		toastr.error("该浏览器不支持断点续传，请使用Chrome、Firefox、Opera浏览器", "错误提示");
+	}
+});
+
+//上传框工具按钮设置
+$("#upload-file-container-tools-down").click(function(){
+	$("#upload-file-container").animate({
+	    bottom: '-385px'
+	});
+	$(this).hide();
+	$("#upload-file-container-tools-up").show();
+});
+
+$("#upload-file-container-tools-up").click(function(){
+    $("#upload-file-container").animate({
+        bottom: 0
+    });
+    $(this).hide();
+    $("#upload-file-container-tools-down").show();
+});
+
+$("#upload-file-container-tools-close").click(function(){
+    $("#upload-file-container").animate({
+        bottom: "-430px"
+    });
+    $("#upload-file-container-tools-up").hide();
+    $("#upload-file-container-tools-down").show();
+    
+    filesArr=[];
+    count = 0;
+    map = {};
+    $list.html("");
+});
+
+// function IEVersion() {
+//     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+//     var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器
+//     var isEdge = userAgent.indexOf("Edge") > -1 && !isIE; //判断是否IE的Edge浏览器
+//     var isIE11 = userAgent.indexOf('Trident') > -1 && userAgent.indexOf("rv:11.0") > -1;
+//     if(isIE) {
+//         var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+//         reIE.test(userAgent);
+//         var fIEVersion = parseFloat(RegExp["$1"]);
+//         if(fIEVersion == 7) {
+//             return 7;
+//         } else if(fIEVersion == 8) {
+//             return 8;
+//         } else if(fIEVersion == 9) {
+//             return 9;
+//         } else if(fIEVersion == 10) {
+//             return 10;
+//         } else {
+//             return 6;//IE版本<=7
+//         }
+//     } else if(isEdge) {
+//         return 'edge';//edge
+//     } else if(isIE11) {
+//         return 11; //IE11
+//     }else{
+//         return -1;//不是ie浏览器
+//     }
+// }
+
+/**
+ * 模块：隐藏工具栏
+ */
+ function hideToolbar(){
+	 $("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button, #copy-to-private-button").hide();
+}
+
+/**
+ * 模块： 获取文件/文件夹列表
+ */
+
+var $fileTable = $('#file-table').bootstrapTable('destroy').bootstrapTable({
+    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+    url: '/kscd/api/general-storage/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh: true,
+    //showColumns: true,
+    //toolbar: '#file-table-toolbar',
+    search: false,
+    strictSearch: true,
+    clickToSelect: false,
+    pagination: true,
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 20, 50 ,100],
+    paginationPreText: "上一页",
+    paginationNextText: "下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType: "",
+    queryParams: function(params){
+        var temp = {
+			'pageSize': params.pageSize,
+			'pageNumber': clickByDirOrPageButton === 1 ? 1 : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+			'file_id': file_id
+        };
+        thisPage = params.pageNumber;
+        thisPageSize = params.pageSize;
+        console.log("获取文件/文件夹列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+            checkbox: true
+        },
+        {
+        	title: '序号',
+        	width: 60,
+        	valign: "middle",
+        	formatter: function (value, row, index) {
+        		return index + 1;
+        	}
+        },
+        {
+            field: 'file_type',
+            title: '类型',
+            valign: 'middle',
+            width: 50,
+            formatter: fileTableType
+        },
+        {
+            field: 'name',
+            title: '名称',
+            valign: 'middle',
+            formatter: fileTableName
+        },{
+            field: 'secname',
+            title: '密级',
+            width: 100,
+            formatter: fileTableGetSecretaries
+        },{
+            field: 'size',
+            title: '大小',
+            width: '16%',
+            formatter: fileTableSize
+        },{
+            field: 'create_time',
+            title: '上传时间',
+            width: 200
+        },{
+            field: 'chg_time',
+            title: '最后修改时间',
+            width: 200
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickedRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    },
+    onCheck: function(row){
+        var checkedFiles = $fileTable.bootstrapTable('getSelections');
+        var len = checkedFiles.length;
+        if(len == 1){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+//             if(checkedFiles[0].file_type == 0){
+//                 $("#copy-to-private-button").hide();
+//             }else if(checkedFiles[0].file_type == 1){
+//                  $("#share-button").hide();
+//             }
+        }
+
+        if(len > 1){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+            $("#create-exlinks-button, #share-button, #rename-button").hide();
+//             for(var i = 0; i<len; i++){
+//                 if(checkedFiles[i].file_type == 0){
+//                     $("#copy-to-private-button").hide();
+//                     break;
+//                 }
+//             }
+        }
+    },
+    onCheckAll: function(row){
+        var checkedFiles = $fileTable.bootstrapTable('getSelections');
+        var len = checkedFiles.length;
+        if(len == 1){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+//             if(checkedFiles[0].file_type == 0){
+//                 $("#create-exlinks-button, #copy-to-private-button").hide();
+//             }else if(checkedFiles[0].file_type == 1){
+//                  $("#share-button").hide();
+//             }
+        }
+
+        if(len > 1){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+            $("#create-exlinks-button, #share-button, #rename-button").hide();
+//             for(var i = 0; i<len; i++){
+//                 if(checkedFiles[i].file_type == 0){
+//                     $("#copy-to-private-button").hide();
+//                     break;
+//                 }
+//             }
+        }
+    },
+    onUncheck: function(row){
+        var checkedFiles = $fileTable.bootstrapTable('getSelections');
+        var len = checkedFiles.length;
+        if(len == 0){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").hide();
+        }
+        if(len == 1){
+        	$("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+//             if(checkedFiles[0].file_type == 0){
+//                 $("#copy-to-private-button").hide();
+//             }else if(checkedFiles[0].file_type == 1){
+//                  $("#share-button").hide();
+//             }
+        }
+
+        if(len > 1){
+            $("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").show();
+            $("#create-exlinks-button, #share-button, #rename-button").hide();
+//             for(var i = 0; i<len; i++){
+//                 if(checkedFiles[i].file_type == 0){
+//                     $("#copy-to-private-button").hide();
+//                     break;
+//                 }
+//             }
+        }
+    },
+    onUncheckAll: function(row){
+        $("#create-exlinks-button, #share-button, #download-button, #delete-button, #rename-button, #move-to-button, #copy-to-button").hide();
+    },
+    onPageChange: function(number, size){
+    	clickByDirOrPageButton = 0;
+    	hideToolbar();
+    }
+});
+
+function fileTableType(value, row, index){
+   var result;
+   if(value == 0){
+	   result = '<img src="/static/img/opened_folder.png">'
+   }else{
+	   result = '<img src="/static/img/document.png">'
+   }
+   return result;
+}
+
+function fileTableName (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + row.file_id + ",'" + row.name + "')\" target=\"_self\">" + row.name + "</a>";
+   }else{
+      result = row.name;
+   }
+   
+   return result;
+}
+
+function fileTableGetSecretaries(value, row, index){
+	var result;
+	if(row.file_type == 0){
+		result = "无";
+	}else{
+		result = row.secname + '<button class="btn btn-action edit" type="button" title="修改密级" style="padding-left:10px" onclick="openSecurityLevelModal(' + row.file_id + ',\'' + row.name + '\')"><i class="fa fa-edit" id="iconedit"></i></button>';
+	}
+	return result;
+}
+
+function fileTableSize (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "--";
+   }else{
+      result = unitConversion(row.size);
+   }
+   return result;
+}
+
+function setFileId(id, name){
+	   file_id = id;
+	   clickByDirOrPageButton = 1;
+	   //$fileTable.bootstrapTable("refresh");
+	   $fileTable.bootstrapTable('selectPage',1);
+	   hideToolbar();
+	   
+	   //如果点击的是路径中存在的文件夹，则将其后的文件夹删除，当前文件夹的链接也取消
+	   for(var i = 0; i<path_arr.length; i++){
+	      if(path_arr[i].file_id == id){
+	         path_arr.splice(i+1, path_arr.length-(i+1));
+	         var urlObjLen = path_arr.length;
+	         var urlPath = "";
+	         if(urlObjLen == 1){
+		     	urlPath += path_arr[0].name;
+		     	$("#base-path").html(urlPath);
+	         }else if(urlObjLen > 1){
+		        for(var i = 0; i < (urlObjLen-1); i++){
+			    	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+			    }
+		        urlPath += path_arr[urlObjLen-1].name;
+		        $("#base-path").html(urlPath);
+	         }
+	         return;
+	      }
+	   }
+	   
+	   //点击的如果是表格中的文件夹，则将该文件夹添加至路径末尾
+	   path_arr.push({'file_id': id, 'name': name});
+	   var urlObjLen = path_arr.length;
+	   var urlPath = "";
+	   if(urlObjLen == 1){
+	     	urlPath += path_arr[0].name;
+	     	$("#base-path").html(urlPath); 
+	   }else if(urlObjLen > 1){
+		   for(var i = 0; i < (urlObjLen-1); i++){
+		   	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+		   }
+	       urlPath += path_arr[urlObjLen-1].name;
+	       $("#base-path").html(urlPath);
+	   }  
+}
+
+/**
+ * 模块：新建文件夹
+ */
+ 
+$("#new-folder-button").click(function(){
+    $("#new-dir-modal").modal("show");
+});
+
+$('#new-dir-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	newDirModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）.\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线 、  . 或中英文括号'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var params = JSON.stringify({file_name: $("#new-dir-modal-name").val(), file_pid: file_id});
+	console.log("新建文件夹时传给后台的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/general-storage/create-dir/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("新建文件夹时后台返回的参数：");
+			console.log(data);
+			if(data.ret){
+				$("#new-dir-modal-form")[0].reset();
+				$("#new-dir-modal-form").data('bootstrapValidator').resetForm();
+				$("#new-dir-modal").modal("hide");
+				toastr.success("创建文件夹成功", "成功提示");
+				$fileTable .bootstrapTable("refresh");
+				hideToolbar();
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：创建外链
+ */
+
+// 步骤一：设置失效时间
+$("#create-exlinks-button").click(function(){
+	var checkedFiles = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFiles.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要分享的文件或者文件夹", "错误提示");
+	}else if(len == 1){
+		$("#create-exlink-modal").modal("show");
+	}else if(len > 1){
+		toastr.error("一次只能分享一个文件或者文件夹", "错误提示");
+	}
+})
+
+// 重置分享文件(夹)表单
+function resetCreateExlinkModalForm(){
+	$("#create-exlink-modal-form")[0].reset();
+}
+
+// 步骤二： 获取外链信息
+$("#create-exlink-modal-submit").click(function(e){
+	e.preventDefault();
+	var checkedFiles = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFiles.length;
+	var params = JSON.stringify({file_id: checkedFiles[0].file_id, validity: $('input[name="createExlinkModalValidity"]:checked').val()});
+	console.log("用户设置的失效时间：");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/external-link/',
+		data: params,
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("设置失效时间后，后台返回的数据：");
+			console.log(data);
+			if(data.ret == true){
+				// 获取创建的外链信息 begin
+				resetCreateExlinkModalForm();
+				$("#create-exlink-modal").modal("hide");
+				$("#share-modal").modal("show");
+				$("#share-modal-url").val(data.external_link.key);
+				$("#share-modal-expire-time").val(data.external_link.expire_time);
+				$("#share-modal-code").val(data.external_link.password);
+			    var url_code = "链接: " + data.external_link.key + " 提取码: " + data.external_link.password;
+			    var urlCode = document.getElementById("share-modal-url-code");
+			    urlCode.value = url_code;
+				// 获取创建的外链信息 end
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+function copyForClick(){
+    var urlCode = document.getElementById("share-modal-url-code");
+    urlCode.select();
+    document.execCommand("Copy");
+    toastr.success("链接已经复制到剪贴板", "信息提示");
+}
+
+/**
+ * 模块：共享给用户
+ */
+ 
+$("#share-to-user-button").click(function(){
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要共享的文件或文件夹", "错误提示")
+	}else if(len > 1){
+		toastr.error("一次只能共享一个文件或文件夹", "错误提示")
+	}else if(len == 1){
+	    $("#share-to-user-modal").modal({
+	        show: true,
+	        backdrop:'static'
+	    });
+	    
+	    var fileIdForUser = checkedFile[0].file_id;
+	    
+	    var url = '/kscd/api/myshare/to-user/' + fileIdForUser + '/';
+	    console.log('共享文件或文件夹获取用户列表时提交的url');
+	    console.log(url);
+	    
+	    $.ajax({
+	        type: "GET",
+	        url: url,
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log("修改用户获取用户列表时后台返回的数据：");
+	        	console.log(data);
+	        	if(data.ret){
+	        		var html = "";
+	        		var arr = data.users;
+	        		var len = arr.length;
+	        		for(var i = 0; i<len; i++){
+ 	        			if(arr[i].selected){
+ 	        				html += "<option value='" + arr[i].id + "' selected>" + arr[i].name + "</option>";
+ 	        			}else{
+ 	        				html += "<option value='" + arr[i].id + "'>" + arr[i].name + "</option>";
+ 	        			}
+	        		}
+	        		console.log(html);
+	        		$("#share-to-user-modal-pre-selected-options").html(html);
+	        		$('#share-to-user-modal-pre-selected-options').multiSelect('refresh');
+	        		$('#share-to-user-modal-pre-selected-options').multiSelect({ keepOrder: true });
+	        	}else{
+	        		toastr.error(data.msg,"错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败","错误提示");
+	        }
+	    });	
+	}
+});
+
+$("#share-to-user-modal-submit").click(function(e){
+    e.preventDefault();
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+    var userIds = $("#share-to-user-modal-pre-selected-options").val();
+    console.log("当前选择的用户");
+    console.log(userIds);
+    if(userIds == null){
+    	toastr.error("请选择需要共享的用户", "错误提示");
+    	return;
+    }
+    var params = JSON.stringify({file_id: checkedFile[0].file_id, owner_id: checkedFile[0].owner_id, shared_id: userIds});
+    console.log("共享给用户时传给后台的参数：");
+    console.log(params);
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/share-touser/",
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log("共享给用户时后台返回的数据：");
+        	console.log(data);
+        	if(data.ret){
+    		    $("#share-to-user-modal").modal('hide');
+    		    toastr.success("共享给用户成功", "正确提示");
+        	}else{
+        		toastr.error(data.msg,"错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败","错误提示");
+        }
+    });
+});
+
+/**
+ * 模块：共享给共享组
+ */
+
+var fileTreeSettingForShareToGroup = {
+	check : {
+		enable : true,
+		chkboxType : {
+			"Y" : "",
+			"N" : ""
+		}
+	},
+	view : {
+		dblClickExpand : false
+	},
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+		beforeClick : function(treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("share-to-group-modal-tree");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return true;
+		},
+		onCheck : function(e, treeId, treeNode) {
+
+		}
+	}
+};
+
+$("#share-to-group-button").click(function(){
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要共享的文件或文件夹", "错误提示")
+	}else if(len > 1){
+		toastr.error("一次只能共享一个文件或文件夹", "错误提示")
+	}else if(len == 1){		
+	    $("#share-to-group-modal").modal({
+	        show: true,
+	        backdrop:'static'
+	    });
+	    
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/myshare/to-group/'  + checkedFile[0].file_id + '/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log('请求所有共享组时后台返回的数据：');
+	        	console.log(data);
+	        	if(data.ret){
+		            $.fn.zTree.init($("#share-to-group-modal-tree"), fileTreeSettingForShareToGroup, data.groups);
+	        	}else{
+	        		toastr.error(data.msg, "错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+});
+
+$("#share-to-group-modal-submit").click(function(e){
+	e.preventDefault();
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var groupIds = [];
+	var zTree = $.fn.zTree.getZTreeObj("share-to-group-modal-tree");
+	var nodes = zTree.getCheckedNodes(true);
+	for (var i = 0, l = nodes.length; i < l; i++) {
+		groupIds.push(nodes[i].group_id);
+	}
+
+	if(JSON.stringify(groupIds) == "{}" || JSON.stringify(groupIds) == "[]"){
+		toastr.error("请选择需要共享的共享组", "错误提示");
+		return;
+	}
+
+    var params = JSON.stringify({file_id: checkedFile[0].file_id, owner_id: checkedFile[0].owner_id, shared_id: groupIds});
+    console.log("共享给共享组时传给后台的参数：");
+    console.log(params);
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/share-togroup/",
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log('提交所有选择的共享组ID时后台返回的数据：');
+        	console.log(data);
+        	if(data.ret){
+        		toastr.success("共享给共享组成功", "成功提示");
+    		    $("#share-to-group-modal").modal('hide');
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+/**
+ * 模块：共享给部门
+ */
+ 
+var fileTreeSettingForShareToDept = {
+	check : {
+		enable : true,
+		chkboxType : {
+			"Y" : "",
+			"N" : ""
+		}
+	},
+	view : {
+		dblClickExpand : false
+	},
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+		beforeClick : function(treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("share-to-department-modal-tree");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return true;
+		},
+		onCheck : function(e, treeId, treeNode) {
+
+		}
+	}
+};
+
+$("#share-to-department-button").click(function(){
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要共享的文件或文件夹", "错误提示")
+	}else if(len > 1){
+		toastr.error("一次只能共享一个文件或文件夹", "错误提示")
+	}else if(len == 1){		
+	    $("#share-to-department-modal").modal({
+	        show: true,
+	        backdrop:'static'
+	    });
+	    
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/myshare/to-dept/'  + checkedFile[0].file_id + '/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log('请求所有文件夹时后台返回的数据：');
+	        	console.log(data);
+	        	if(data.ret){
+		            $.fn.zTree.init($("#share-to-department-modal-tree"), fileTreeSettingForShareToDept, data.depts);
+		            var usersTreeObj = $.fn.zTree.getZTreeObj("share-to-department-modal-tree");
+		            usersTreeObj.expandAll(true);
+	        	}else{
+	        		toastr.error(data.msg, "错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+});
+
+$("#share-to-department-modal-submit").click(function(e){
+	e.preventDefault();
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var deptIds = [];
+	var zTree = $.fn.zTree.getZTreeObj("share-to-department-modal-tree");
+	var nodes = zTree.getCheckedNodes(true);
+	for (var i = 0, l = nodes.length; i < l; i++) {
+		deptIds.push(nodes[i].id);
+	}
+
+	if(JSON.stringify(deptIds) === "{}" || JSON.stringify(deptIds) === "[]"){
+		toastr.error("请选择需要共享的部门", "错误提示");
+		return;
+	}
+
+    var params = JSON.stringify({file_id: checkedFile[0].file_id, owner_id: checkedFile[0].owner_id, shared_id: deptIds});
+    console.log("共享给部门时传给后台的参数：");
+    console.log(params);
+    $.ajax({
+        type: "POST",
+        url: '/kscd/api/general-storage/share-todept/',
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log('提交所有选择部门ID时后台返回的数据：');
+        	console.log(data);
+        	if(data.ret){
+        		toastr.success("共享给部门成功", "成功提示");
+    		    $("#share-to-department-modal").modal('hide');
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+/**
+ * 模块：下载
+ */
+ 
+$("#download-button").click(function(){
+    var checkedFiles = $fileTable.bootstrapTable('getSelections');
+    var len = checkedFiles.length;
+
+    if(len > 0){
+    	for(var i = 0; i<len; i++){
+    	  if(Number(checkedFiles[i].file_type) == 0){
+      		  toastr.error("不能下载文件夹：" + checkedFiles[i].name, "错误提示");
+      	  }else{
+       		  var iframe = document.createElement("iframe");
+       		  iframe.style.display = "none"; // 防止影响页面
+       		  iframe.style.height = 0; // 防止影响页面
+       		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFiles[i].file_id; 
+       		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+       		  // 5分钟之后删除
+       		  setTimeout(function(){
+       		    iframe.remove();
+       		  }, 5 * 60 * 1000);
+      	  }
+    	}
+    }else{
+        toastr.error("请选择需要下载的文件", "错误提示");
+    }
+});
+
+/**
+ * 模块：删除
+ */
+ 
+$("#delete-button").click(function(){
+    var checkedFiles = $fileTable.bootstrapTable('getSelections');
+    var len = checkedFiles.length;
+    var currentPageDataLen = $fileTable.bootstrapTable('getData').length;//当前页数据条数
+    if(len == 0){
+        toastr.error("请选择需要删除的文件或文件夹", "错误提示");
+    }else if(len > 0){
+    	var file_ids = [];
+    	for(var i = 0; i < len; i++){
+    		file_ids.push(checkedFiles[i].file_id);
+    	}
+    	
+    	var parmars = JSON.stringify({"file_ids": file_ids});
+    	console.log("删除多个文件时传给后台的参数");
+    	console.log(parmars);
+    	
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/general-storage/remove-many/',
+			data: parmars,
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("删除文件提交数据成功时后台返回的参数：");
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除文件成功", "成功提示");
+					var totalRows = Number($("#bootstrapTableTotalRows").text());
+	            	var totalPages = Math.ceil(totalRows/thisPageSize);
+					if(thisPage == totalPages){
+		            	if(len < currentPageDataLen){
+		            		$fileTable.bootstrapTable("refresh");
+		            	}else if(len == currentPageDataLen){
+		            		$fileTable.bootstrapTable('prevPage');
+		            	}
+					}else{
+						$fileTable.bootstrapTable("refresh");
+					}
+					getStorageSize();
+					hideToolbar();
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+    }
+});
+
+/**
+ * 模块：重命名
+ */
+
+$("#rename-button").click(function(){
+	var checkedFiles = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFiles.length;
+	
+	if(len == 0){
+		toastr.error("请选择一个文件或者文件夹", "错误提示");
+	}else if(len == 1){
+		$("#rename-file-modal").modal({
+            show: true,
+            backdrop:'static'
+        });
+		
+		if(Number(checkedFiles[0].file_type) == 0){
+			$("#rename-file-modal-choice-file-type").text("文件夹名称：");
+		}else if(Number(checkedFiles[0].file_type) == 1){
+			$("#rename-file-modal-choice-file-type").text("文件名：");
+		}
+		
+		$("#rename-file-modal-file-id").val(checkedFiles[0].file_id);
+		$("#rename-file-modal-name").val(checkedFiles[0].name);
+		
+	}else if(len > 1){
+		toastr.error("一次只能编辑一个文件或者文件夹", "错误提示");
+	}
+});
+
+$('#rename-file-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	renameFileModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_.()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线、  . 或中英文括号'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	//param request:
+	var file_id = $("#rename-file-modal-file-id").val();
+	var newName = $("#rename-file-modal-name").val();
+	var params = JSON.stringify({file_new_name: newName});
+	console.log("修改文件/文件夹名称时传给后台的参数：");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/general-storage/rename-file/' + file_id + '/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("修改名称时后台返回的参数");
+			console.log(data);
+			if(data.ret){
+				$("#rename-file-modal-form")[0].reset();
+				$("#rename-file-modal-form").data('bootstrapValidator').resetForm();
+				$("#rename-file-modal").modal("hide");
+				toastr.success("修改名称成功", "成功提示");
+				$fileTable .bootstrapTable("refresh");
+				hideToolbar();
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：移动到个人空间
+ */
+
+var filePidForMoveToSpace = "";
+var fileTreeSettingForMoveToSpace = {
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+			console.log("当前文件夹file_id");
+			console.log(treeNode.file_id);
+			filePidForMoveToSpace = treeNode.file_id;
+     	}
+	}
+};
+
+$("#move-to-space-button").click(function(){
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要移动的文件或文件夹", "错误提示")
+	}else if(len >= 1){		
+	    $("#move-to-space-modal").modal({
+	        show: true,
+	        backdrop:'static'
+	    });
+	    
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/general-storage/dirs/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log('请求所有文件夹时后台返回的数据：');
+	        	console.log(data);
+	        	if(data.ret){
+		            $.fn.zTree.init($("#move-to-space-modal-tree"), fileTreeSettingForMoveToSpace, data.dirs);
+		            var usersTreeObj = $.fn.zTree.getZTreeObj("move-to-space-modal-tree");
+		            usersTreeObj.expandAll(true);
+	        	}else{
+	        		toastr.error(data.msg, "错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+});
+
+$("#move-to-space-modal-submit").click(function(e){
+	e.preventDefault();
+	if(file_id == filePidForMoveToSpace){
+		toastr.error("目标文件夹与当前文件夹一致，请重新选择", "错误提示");
+		return;
+	}else if(filePidForMoveToSpace == ""){
+		toastr.error("请选择目标文件夹", "错误提示");
+		return;
+	}
+	
+	var checkedFiles = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFiles.length;
+	var file_ids = [];
+	for(var i = 0; i < len; i++){
+		file_ids.push(checkedFiles[i].file_id);
+	}
+
+    var params = JSON.stringify({"file_ids": file_ids, "file_new_pid": filePidForMoveToSpace});
+    console.log("移动到个人空间的提交的参数：");
+    console.log(params);
+    $.ajax({
+        type: "POST",
+        url: '/kscd/api/general-storage/move-many/',
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log('移动文件或者文件夹时后台返回的数据：');
+        	console.log(data);
+        	if(data.ret){
+        		toastr.success("移动成功", "成功提示");
+    		    $("#move-to-space-modal").modal('hide');
+    		    $fileTable .bootstrapTable("refresh");
+    		    hideToolbar();
+    		    filePidForMoveToSpace = "";
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+function initFilePidForMoveToSpace(){
+	filePidForMoveToSpace = "";
+}
+
+/**
+ * 模块：移动到私密空间
+ */
+ 
+// var fileTreeSettingForMoveToPrivate = {
+//     data: {
+//         simpleData: {
+//             enable: true
+//         }
+//     },
+//     callback: {
+//         onClick: function onClick(event, treeId, treeNode) {
+
+//         }
+//     }
+// };
+
+// $("#move-to-private-button").click(function(){
+//     $("#move-to-private-modal").modal("show");
+//     $.ajax({
+//         type: "GET",
+//         url: 'data/' + 'dir' + '.json',
+//         data: {},
+//         dataType: "json",
+//         success: function(data){
+//             $.fn.zTree.init($("#move-to-private-modal-tree"), fileTreeSettingForMoveToPrivate, data);
+//         },
+//         error: function(data){
+//             console.log(data);
+//         }
+//     });
+// });
+
+/**
+ * 模块：复制到个人空间
+ */
+ 
+var filePidForCopyToSpace = "";
+
+var fileTreeSettingForCopyToSpace = {
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+			console.log("当前文件夹file_id");
+			console.log(treeNode.file_id);
+			filePidForCopyToSpace = treeNode.file_id;
+     	}
+	}
+};
+
+$("#copy-to-space-button").click(function(){
+	var checkedFile = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFile.length;
+	
+	if(len == 0){
+		toastr.error("请选择需要复制的文件或文件夹", "错误提示")
+	}else if(len >= 1){		
+	    $("#copy-to-space-modal").modal({
+	        show: true,
+	        backdrop:'static'
+	    });
+	    
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/general-storage/dirs/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log('请求所有文件夹时后台返回的数据：');
+	        	console.log(data);
+	        	if(data.ret){
+		            $.fn.zTree.init($("#copy-to-space-modal-tree"), fileTreeSettingForCopyToSpace, data.dirs);
+		            var usersTreeObj = $.fn.zTree.getZTreeObj("copy-to-space-modal-tree");
+		            usersTreeObj.expandAll(true);
+	        	}else{
+	        		toastr.error(data.msg, "错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+});
+
+$("#copy-to-space-modal-submit").click(function(e){
+	e.preventDefault();
+	if(file_id == filePidForCopyToSpace){
+		toastr.error("目标文件夹与当前文件夹一致，请重新选择", "错误提示");
+		return;
+	}else if(filePidForCopyToSpace == ""){
+		toastr.error("请选择目标文件夹", "错误提示");
+		return;
+	}
+	
+	var checkedFiles = $fileTable.bootstrapTable('getSelections');
+	var len = checkedFiles.length;
+	var file_ids = [];
+	for(var i = 0; i<len; i++){
+		file_ids.push(checkedFiles[i].file_id);
+	}
+
+	var params = JSON.stringify({"file_new_pid": filePidForCopyToSpace, "file_ids": file_ids});
+
+    console.log("复制到个人空间的提交的参数：");
+    console.log(params);
+    
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/copy-many/",
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log('复制文件或者文件夹时后台返回的数据：');
+        	console.log(data);
+        	if(data.ret){
+        		toastr.success("复制成功", "成功提示");
+    		    $("#copy-to-space-modal").modal('hide');
+    		    filePidForCopyToSpace = "";
+    		    $fileTable.bootstrapTable("refresh");
+				getStorageSize();
+				hideToolbar();
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+function initFilePidForCopyToSpace(){
+	filePidForCopyToSpace = "";
+}
+
+/**
+ * 模块：修改密级
+ */
+ 
+function openSecurityLevelModal(file_id, file_name){
+	$("#modify-security-level-modal").modal("show");
+	$("#modify-security-level-modal-title").text("修改[" + file_name + "]的密级");
+	$("#modify-security-level-modal-hidden").val(file_id);
+    $.ajax({
+        type: "GET",
+        url: "/kscd/api/system-manage/seclevel/",
+        data: {},
+        dataType: "json",
+        success: function(data){
+        	console.log('返回密级列表的数据：');
+        	console.log(data);
+        	if(data.ret){
+				var html = "";
+				for(var i = 0; i<data.seclevels.length; i++){
+					html += '<option value="' + data.seclevels[i].seclevel + '">' + data.seclevels[i].name + '</option>';
+				}
+				$("#modify-security-level-modal-name").html(html);
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+};
+
+$('#modify-security-level-modal-form').bootstrapValidator({
+	message : '该值无效',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	fields : {
+		changePasswordModalConfirmPassword : {
+			message : '密级无效',
+			validators : {
+                notEmpty: {
+                    message: '密级不能为空'
+                }
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	var params = JSON.stringify( {"file_id": $("#modify-security-level-modal-hidden").val(), "seclevel": $("#modify-security-level-modal-name").val()});
+	console.log('设置密级时提交的参数：');
+	console.log(params);
+    $.ajax({
+        type: "POST",
+        url: "/kscd/api/general-storage/set-seclevel/",
+        data: params,
+        dataType: "json",
+        success: function(data){
+        	console.log('设置密级时返回的数据：');
+        	console.log(data);
+        	if(data.ret){
+        		toastr.success($("#modify-security-level-modal-title").text() + "成功", "正确提示");
+        		$("#modify-security-level-modal-form")[0].reset();
+        		$("#modify-security-level-modal-form").data('bootstrapValidator').resetForm();
+        		$("#modify-security-level-modal").modal("hide");
+        		$fileTable.bootstrapTable("refresh");
+        	}else{
+        		toastr.error(data.msg, "错误提示");
+        	}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+/**
+ * 模块：复制到私密空间
+ */
+// var fileTreeSettingForCopyToPrivate = {
+//     data: {
+//         simpleData: {
+//             enable: true
+//         }
+//     },
+//     callback: {
+//         onClick: function onClick(event, treeId, treeNode) {
+
+//         }
+//     }
+// };
+
+// $("#copy-to-private-button").click(function(){
+//     $("#copy-to-private-modal").modal("show");
+
+//     $.ajax({
+//         type: "GET",
+//         url: 'data/' + 'dir' + '.json',
+//         data: {},
+//         dataType: "json",
+//         success: function(data){
+//             $.fn.zTree.init($("#copy-to-private-modal-tree"), fileTreeSettingForCopyToPrivate, data);
+//         },
+//         error: function(data){
+//             console.log(data);
+//         }
+//     });
+
+// });
+
+/**
+ * 模块：重置表单
+ */
+ 
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+}
+
+/**
+ * 设置表格最适高度
+ */
+ 
+$(function(){
+	var fileTableContainHeight = $(document).height() - $(".top-nav").height() - $(".botton-panel").height() - $(".base-path").height() - 65;
+	$("#file-table-contain").height(fileTableContainHeight);
+
+	$(window).resize(function() {
+		var fileTableContainHeight = $(document).height() - $(".top-nav").height() - $(".botton-panel").height() - $(".base-path").height() - 65;
+		$("#file-table-contain").height(fileTableContainHeight);
+	});
+});
+</script>
+
+{% include "dist/common.html" %}
+
+{% include "dist/common-user.html" %}
+
+{% include "dist/unread-counts.html" %}
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<script>
+/**
+ * 获取收到的共享数
+ */
+function getUnreadCounts(){
+	$.ajax({
+	    type: "GET",
+	    url: '/kscd/api/receive-share/unread-counts/',
+	    data: {},
+	    dataType: "json",
+	    success: function(data){
+	    	console.log("收到的共享，未读个数查询返回的数据");
+	    	console.log(data);
+	        if(data.ret == true){
+	        	var unreadCounts = data.unread_counts;
+	        	var shareNumbers = document.getElementById("share-numbers");
+	        	if(unreadCounts > 0){
+	        		shareNumbers.innerText = unreadCounts;
+	        	}else{
+	        		shareNumbers.innerText = '';
+	        	}
+	        }else{
+	        	toastr.error(data.err_msg, "错误提示");
+	        }
+	    },
+	    error: function(data){
+	    	toastr.error("连接失败", "错误提示");
+	    }
+	});
+}
+
+getUnreadCounts();
+
+setInterval(function(){
+	getUnreadCounts();
+}, 1000*60);
+</script>

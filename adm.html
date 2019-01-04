@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>管理员管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+      <div class="main-right-in">
+		<!-- =============================================== // content begin ====================================================== -->
+		<div class="botton-panel" id="adm-table-toolbar">
+		  	<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="add-adm-button">
+		     	<i class="glyphicon glyphicon-plus"></i>
+		     	<span>添加</span>
+		     </a>
+		     
+		     <!--<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="edit-adm-button">
+		     	<i class="glyphicon glyphicon-pencil"></i>
+		     	<span>编辑</span>
+		     </a>-->
+		     
+		     <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="delete-adm-button">
+		     	<i class="glyphicon glyphicon-minus"></i>
+		     	<span>删除</span>
+		     </a>
+		</div>
+		
+		<!-- //main begin -->
+		<table id="adm-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+		
+		</table>
+		<!-- main end // -->
+
+ 		<!-- =============================================== content end //====================================================== -->
+ 
+       </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== //all modal begin =============================================== -->
+
+<!-- // add adm  begin -->
+<div class="modal fade" id="add-adm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('add-adm-modal-form');  $('#adm-modal-custom').hide();">
+							×
+						</button>
+						<h4 class="modal-title"> 创建管理员 </h4>
+					</div>
+					<form id="add-adm-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">账号：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-adm-modal-user-name" name="addAdmModalUserName" placeholder="" />
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <!--<div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="add-adm-modal-usbkey" name="addAdmModalUsbkey" /> 智能卡
+                                    </label>
+                                </div>-->
+                            </div>
+                        </div>
+                        
+                       <div class="form-group" id="adm-modal-custom" name='admModalCustom' style="display: none">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">用户名定义：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                              	<label class="radio-inline">
+									<input type="radio" id="adm-modal-sn" name="admModalIdType" value="sn">
+									使用SN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="adm-modal-cn" name="admModalIdType" value="cn">
+									使用CN
+								</label>
+								<label class="radio-inline">
+									<input type="radio" id="adm-modal-user-custom" name="admModalIdType" value="custom" checked="checked">
+									自定义
+								</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">姓名：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="add-adm-modal-name" name="addAdmModalName" />
+                            </div>
+                        </div>
+
+                        <div class="form-group" >
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">所属部门：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6" style="position:relative;z-index:9999999;">
+                                <input type="text" class="form-control" name="addAdmModalDepartment" id="add-adm-modal-department" onFocus="this.blur();"  value="" onClick="showMenuForAdd();"/>
+                                <div id="add-adm-modal-department-content" class="ztree-content">
+                                    <ul id="add-adm-modal-department-tree" class="ztree ztree-modal"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">密码：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6 ">
+                                <input type="password" class="form-control" id="add-adm-modal-password" name="addAdmModalPassword" autocomplete="new-password"/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="add-adm-modal-default-password" name="addAdmModalDefaultPassword"> 默认密码
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="add-adm-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('add-adm-modal-form'); $('#adm-modal-custom').hide();">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- add adm end // -->
+
+<!-- // edit adm  begin -->
+<div class="modal fade" id="edit-adm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('edit-adm-modal-form')">
+							×
+						</button>
+						<h4 class="modal-title"> 编辑管理员 </h4>
+					</div>
+					<form id="edit-adm-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">账号：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="edit-adm-modal-user-name" name="editAdmModalUserName" placeholder="" disabled/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <!--<div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="edit-adm-modal-usbkey" name="editAdmModalUsbkey" disabled/> 智能卡
+                                    </label>
+                                </div>-->
+                            </div>
+                        </div>
+                        
+<!--                        <div class="form-group" name='adm-modal-custom' style="display: none"> -->
+<!--                             <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">用户名定义：</label> -->
+<!--                             <div class="col-lg-6 col-md-6 col-sm-6"> -->
+<!--                               	<label class="radio-inline"> -->
+<!-- 									<input type="radio" id="adm-modal-sn" name="admModalIdType" value="sn"> -->
+<!-- 									使用SN -->
+<!-- 								</label> -->
+<!-- 								<label class="radio-inline"> -->
+<!-- 									<input type="radio" id="adm-modal-cn" name="admModalIdType" value="cn"> -->
+<!-- 									使用CN -->
+<!-- 								</label> -->
+<!-- 								<label class="radio-inline"> -->
+<!-- 									<input type="radio" id="adm-modal-custom" name="admModalIdType" value="custom" checked="checked"> -->
+<!-- 									自定义 -->
+<!-- 								</label> -->
+<!--                             </div> -->
+<!--                         </div> -->
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">姓名：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <input type="text" class="form-control" id="edit-adm-modal-name" name="editAdmModalName" value="jay"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">所属部门：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6" style="position:relative;z-index:9999999;">
+                                <input type="text" class="form-control" name="admEditModalDepartment" id="edit-adm-modal-department" onFocus="this.blur();" onClick="showMenuForEdit();" value="航天学院"/>
+                                <div id="edit-adm-modal-department-content" class="ztree-content">
+                                    <ul id="edit-adm-modal-department-tree" class="ztree" style="width: 100%;border:1px solid #e4eaec;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal align-right">密码：</label>
+                            <div class="col-lg-6 col-md-6 col-sm-6 ">
+                                <input type="password" class="form-control" id="edit-adm-modal-password" name="editAdmModalPassword" value="123456"/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="padding-left: 0;">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="edit-adm-modal-default-password" name="editAdmModalDefaultPassword" disabled> 默认密码
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="edit-adm-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('edit-adm-modal-form')">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- edit adm end // -->
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 配置：已选部门的id
+ */
+var choiceDeptId = "";
+ 
+/**
+ * 模块：添加管理员
+ */
+ 
+$("#add-adm-button").click(function(){
+    $.ajax({
+        type: "GET",
+        url: '/kscd/api/admin/check-permission/',
+        data: {},
+        dataType: "json",
+        success: function(data){
+        	console.log("判断是否有权限添加管理员时后台返回的所有数据");
+			console.log(data);
+			if(data.ret){
+			//add begin
+			    $("#add-adm-modal").modal({
+			        show: true,
+			        backdrop:'static'
+			    });
+			    $.ajax({
+			        type: "GET",
+			        url: '/kscd/api/dept/',
+			        data: {},
+			        dataType: "json",
+			        success: function(data){
+			        	console.log("添加管理员获取所有部门时后台返回的所有数据");
+						console.log(data);
+						if(data.ret){
+							$.fn.zTree.init($("#add-adm-modal-department-tree"), deptTreeSettingForAdd, data.depts);
+						}
+			        },
+			        error: function(data){
+			        	toastr.error("连接失败", "错误提示");
+			        }
+			    });
+			//add end
+			}else{
+				toastr.error("对不起，您没有权限添加管理员", "错误提示");
+			}
+        },
+        error: function(data){
+        	toastr.error("连接失败", "错误提示");
+        }
+    });
+});
+
+//添加管理员下拉树配置
+var deptTreeSettingForAdd = {
+    data : {
+        simpleData : {
+            enable : true
+        }
+    },
+    callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+			console.log("添加管理员时选择的部门");
+			console.log(treeNode);
+            $("#add-adm-modal-department").val(treeNode.name).change();
+			choiceDeptId = treeNode.id;
+			console.log("添加管理员时获取到的部门ID");
+			console.log(choiceDeptId);
+        }
+    }
+};
+
+function showMenuForAdd() {
+    var parentDept = $("#add-adm-modal-department");
+    var parentDeptOffset = $("#add-adm-modal-department").offset();
+    $("#add-adm-modal-department-content").css({
+        right : -10 + "px",
+        top : (parentDept.outerHeight() + 5) + "px"
+    }).slideDown("fast");
+	
+	var treeObj = $.fn.zTree.getZTreeObj("add-adm-modal-department-tree"); 
+	treeObj.expandAll(true); 
+
+    $("body").bind("mousedown", onBodyDownForAdd);
+}
+
+function hideMenuForAdd() {
+    $("#add-adm-modal-department-content").fadeOut("fast");
+    $("body").unbind("mousedown", onBodyDownForAdd);
+}
+
+function onBodyDownForAdd(event) {
+    if (!(event.target.id == "menuBtn"
+            || event.target.id == "add-adm-modal-department"
+            || event.target.id == "add-adm-modal-department-content" || $(event.target).parents(
+                "#add-adm-modal-department-content").length > 0)) {
+        hideMenuForAdd();
+    }
+}
+
+//设置默认密码
+$("#add-adm-modal-default-password").click(function(){
+	if($(this).is(":checked")){
+		$("#add-adm-modal-password").val("qwer1234").change();
+	}else{
+		$("#add-adm-modal-password").val("").change();
+	}
+});
+
+// $('#add-adm-modal-usbkey').click(function(){
+// 	var isUsbKey = $(this).is(':checked');
+
+// 	if (isUsbKey){
+// 			$('#add-adm-modal-form [name="admModalCustom"]').show();
+// 	        var val = $('#add-adm-modal-form input[type=radio][name=admModalIdType]:checked').val();
+//     		if(val == "sn"){
+//     			$("#add-adm-modal-user-name").val("SN字段").change();
+//     		}else if(val == "cn"){
+//     			$("#add-adm-modal-user-name").val("CN字段").change();
+//     		}else if(val == "custom"){
+//     			$("#add-adm-modal-user-name").val("").change();
+//     		}
+// 	} else{
+// 			$('#add-adm-modal-form [name="admModalCustom"]').hide();
+// 			$("#add-adm-modal-user-name").val("").change();
+// 	}
+// });
+
+// $('#add-adm-modal-form input[type=radio][name=admModalIdType]').click(function() {
+// 	if ($(this).is(':checked')) {
+// 		if(this.value == "sn"){
+// 			$("#add-adm-modal-user-name").val("SN字段").change();
+// 		}else if(this.value == "cn"){
+// 			$("#add-adm-modal-user-name").val("CN字段").change();
+// 		}else if(this.value == "custom"){
+// 			$("#add-adm-modal-user-name").val("").change();
+// 		}
+// 	}
+// });
+
+//添加管理员
+$('#add-adm-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    excluded:[":disabled"],
+    fields: {
+        addAdmModalUserName: {
+            message: '账号无效',
+            validators: {
+                notEmpty: {
+                    message: '账号不能为空'
+                },
+				threshold: 6, 
+                remote: {
+                    url: '/kscd/api/admin/check-name/',
+                    message: '账号已存在',
+                    delay:  2000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({name: $('#add-adm-modal-user-name').val()});
+                    }
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_]{6,32}$/,
+					message : '账号为6至32位字母、数字或下滑线'
+				}
+            }
+        },
+        addAdmModalName: {
+            message: '姓名无效',
+            validators: {
+                notEmpty: {
+                    message: '姓名不能为空'
+                },
+				threshold: 2, 
+                remote: {
+                    url: '/kscd/api/admin/check-alias/',
+                    message: '姓名已存在',
+                    delay:  2000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({alias: $('#add-adm-modal-name').val()});
+                    }
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '姓名为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+            }
+        },
+        addAdmModalDepartment: {
+            message: '所属部门无效',
+            trigger:"change",
+            validators: {
+                notEmpty: {
+                    message: '所属部门不能为空'
+                }
+            }
+        },
+        addAdmModalPassword: {
+            message: '密码无效',
+			trigger:"change",
+            validators: {
+                notEmpty: {
+                    message: '密码不能为空'
+                },
+				regexp: {
+					regexp: /^[a-zA-Z0-9_]{6,32}$/,
+					message: '密码为6至32位字母、数字或者下划线'
+				}
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	var admin_name = $("#add-adm-modal-user-name").val();
+	var admin_alias = $("#add-adm-modal-name").val();
+	var dept_id = choiceDeptId;
+	var passwd = $("#add-adm-modal-password").val();
+	var params = JSON.stringify({admin_name: admin_name, admin_alias: admin_alias, auth_type: 1, dept_id: dept_id, passwd: passwd});
+	console.log("添加管理员时传给后台的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/admin/',
+		data: params,
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+		    console.log("添加管理员后台接收数据成功时返回的值");
+			console.log(data);
+			if(data.ret){
+				$("#add-adm-modal-form")[0].reset();
+				//$("#adm-modal-custom").hide();
+				$("#add-adm-modal-form").data('bootstrapValidator').resetForm();
+				$("#add-adm-modal").modal("hide");
+				toastr.success("添加管理员成功", "成功提示");
+				$admTable.bootstrapTable("refresh");
+				choiceDeptId = "";
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+
+});
+
+/**
+ * 模块：编辑管理员
+ */
+// $("#edit-adm-button").click(function(){
+// 	var checkedAdm = $admTable.bootstrapTable('getSelections');
+// 	var len = checkedAdm.length;
+// 	if(len == 0){
+// 		toastr.error("请选择需要编辑的管理员", "错误提示");
+// 	}else if(len == 1){
+// 		$("#edit-adm-modal").modal({
+//             show: true,
+//             backdrop:'static'
+//         });
+// 	}else if(len > 1){
+// 		toastr.error("一次只能编辑一个管理员", "错误提示");
+// 	}
+// });
+
+//编辑管理员下拉树
+// var departmentTreeSettingForEdit = {
+//     data : {
+//         simpleData : {
+//             enable : true
+//         }
+//     },
+//     callback : {
+//         onClick: function onClick(event, treeId, treeNode) {
+//             $("#edit-adm-modal-department").val(treeNode.name).change();
+//         }
+//     }
+// };
+
+// function showMenuForEdit() {
+//     var parentDept = $("#edit-adm-modal-department");
+//     var parentDeptOffset = $("#edit-adm-modal-department").offset();
+//     $("#edit-adm-modal-department-content").css({
+//         right : -10 + "px",
+//         top : (parentDept.outerHeight() + 5) + "px"
+//     }).slideDown("fast");
+
+//     $("body").bind("mousedown", onBodyDownForEdit);
+// }
+
+// function hideMenuForEdit() {
+//     $("#edit-adm-modal-department-content").fadeOut("fast");
+//     $("body").unbind("mousedown", onBodyDownForEdit);
+// }
+
+// function onBodyDownForEdit(event) {
+//     if (!(event.target.id == "menuBtn"
+//             || event.target.id == "edit-adm-modal-department"
+//             || event.target.id == "edit-adm-modal-department-content" || $(event.target).parents(
+//                 "#edit-adm-modal-department-content").length > 0)) {
+//         hideMenuForEdit();
+//     }
+// }
+
+//编辑管理员
+// $('#edit-adm-modal-form').bootstrapValidator({
+//     message: 'This value is not valid',
+//     feedbackIcons: {
+//         valid: 'glyphicon glyphicon-ok',
+//         invalid: 'glyphicon glyphicon-remove',
+//         validating: 'glyphicon glyphicon-refresh'
+//     },
+//     excluded:[":disabled"],
+//     fields: {
+//     	editAdmModalUserName: {
+//             message: '账号无效',
+//             trigger:"change",
+//             validators: {
+//                 notEmpty: {
+//                     message: '账号不能为空'
+//                 },
+//                 stringLength: {
+//                     min: 1,
+//                     max: 30,
+//                     message: '账号为1至30个字符'
+//                 }
+//             }
+//         },
+//         editAdmModalName: {
+//             message: '姓名无效',
+//             validators: {
+//                 notEmpty: {
+//                     message: '姓名不能为空'
+//                 },
+//                 stringLength: {
+//                     min: 1,
+//                     max: 30,
+//                     message: '姓名至少1个字符'
+//                 }
+//             }
+//         },
+//         admEditModalDepartment: {
+//             message: '所属部门无效',
+//             trigger:"change",
+//             validators: {
+//                 notEmpty: {
+//                     message: '所属部门不能为空'
+//                 }
+//             }
+//         },
+//         editAdmModalPassword: {
+//             message: '密码无效',
+//             validators: {
+//                 notEmpty: {
+//                     message: '密码不能为空'
+//                 },
+//                 stringLength: {
+//                     min: 6,
+//                     max: 30,
+//                     message: '密码为6至16位字符'
+//                 },
+//                 regexp: {
+//                     regexp: /^[a-zA-Z0-9_]{6,30}$/,
+//                     message: '密码为6位字母、数字或者下划线'
+//                 }
+//             }
+//         }
+//     }
+// })
+// .on('success.form.bv', function(e) {
+//     e.preventDefault();
+//     $("#edit-adm-modal-form")[0].reset();
+//     $("#edit-adm-modal-form").data('bootstrapValidator').resetForm();
+//     $("#edit-adm-modal").modal("hide");
+//     toastr.success("添加管理员成功", "成功提示");
+//     $admTable.bootstrapTable("refresh");
+// });
+
+/**
+ * 模块：删除管理员
+ */
+function deleteAdm(){
+	var checkedAdm = $admTable.bootstrapTable('getSelections');
+	var len = checkedAdm.length;
+
+	if(len == 0){
+		toastr.error("请选择需要删除的管理员", "错误提示");
+	}
+	
+	if(len == 1){
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/admin/' + checkedAdm[0].id + "/",
+			data: {},
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log("删除管理员后台接受参数成功时返回的数据");
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除成功", "正确提示");
+					$admTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}
+	
+	if(len > 1){
+		var idsArrray = [];
+		for(var i = 0; i<len; i++){
+			idsArrray.push(checkedAdm[i].id);
+		}
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/admin/',
+			data: JSON.stringify({ids: idsArrray}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除成功", "正确提示");
+					$admTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}
+}
+
+$("#delete-adm-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				deleteAdm();
+			}else{
+				toastr.error('对不起，您没有权限删除管理员', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+	choiceDeptId = "";
+}
+
+/**
+ * 模块：获取管理员
+ */
+var $admTable = $('#adm-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/admin/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'id',                        
+    striped: false,                         
+    cache: false, 
+	sortName: 'id',
+    sortable: true,
+    sortOrder: "desc",
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: true,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#adm-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder
+        };
+		console.log(params);
+        return temp;
+    },
+    columns: [
+        {
+	        checkbox: true
+        },{
+	        field: 'admin_name',
+	        title:'账号',
+	        valign: 'middle',
+	        width: '16%'
+        },{
+	        field: 'admin_alias',
+	        title:'姓名',
+	        width: '16%'
+        },{
+	        field: 'auth_type',
+	        title:'密码认证',
+	        width: '16%',
+	        formatter: admTableAuthType
+        },{
+	        field: 'ukey',
+	        title:'USBKEY认证',
+	        valign: 'middle',
+	        width: '16%',
+	        formatter: admTableUkey
+        },{
+	        field: 'dept_name',
+	        title:'所属部门',
+	        valign: 'middle'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+        toastr.error("数据加载失败！", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+function admTableAuthType(value, row, index){
+	var result = "";
+	if(Number(value) == 1){
+		result = "是";
+	}else{
+		result = "否";
+	}
+	return result;
+}
+
+function admTableUkey(value, row, index){
+	var result = "";
+	if(value == null){
+		result = "否";
+	}else{
+		result = "是";
+	}
+	return result;
+}
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

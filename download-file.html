@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>文件下载</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<link rel="stylesheet" href="/static/libs/lou-multi-select-e052211/css/multi-select.css" type="text/css">
+<link rel="stylesheet" href="/static/libs/webuploader/webuploader.css" type="text/css">
+</head>
+
+<body class="narrow-page-bg">
+<!-- // body begin -->
+<div class="download-main">
+	<div class="download-main-logo">
+    	<img src="/static/img/logo2.png" /><span>麒麟信安云盘</span>
+    </div>
+
+    <div class="download-main-body">
+        <div class="download-main-body-above">
+            <div class="col-lg-6 col-md-6 col-sm-6" style="width:60px;margin-left:10px;margin-top:10px;">
+              <img src="/static/img/user.PNG" style="border-radius:65%;width:50px;">
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6" style="width:260px;margin-left:5px;margin-top:30px;color:#fff;">
+              <span> <b id="user-name"></b> 给您分享的文件</b></span>
+            </div>
+        </div>
+        
+        <div class="download-main-body-below">
+	        <div class="botton-panel" style="text-align: right">
+				<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="download-button">
+					<i class="glyphicon glyphicon-download-alt"></i>
+					<span>下载</span>
+				</a>
+			</div>
+			
+	        <div class="base-path">下载路径：<span id="base-path">根文件夹</span></div>
+	        
+			<table id="file-table" data-toggle="table" class="table table-bordered table-striped" style="border: 1px solid #d4d8da;z-index: -1;">
+			
+			</table>
+        <div>
+    </div>
+</div>
+<!-- body end // -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/lou-multi-select-e052211/js/jquery.multi-select.js"></script>
+<script src="/static/libs/webuploader/webuploader.min.js"></script>
+<script>
+var file_id = 1; //初始化当前文件夹id，1为根目录
+var path_arr = [{file_id: 1, name: '根文件夹'}]; //初始化路径
+var storage = window.localStorage;
+
+var x = document.cookie;
+console.log("cookie");
+console.log(x);
+console.log("userName值");
+console.log(storage.userName);
+console.log("file_id值");
+console.log(storage.fileId);
+//var cookieArr = cookie.split(";");
+//var userName = cookieArr[0].split("=")[1].trim();
+//var file_id = cookieArr[1].split("=")[1].trim();
+
+var userName = storage.userName;
+file_id = storage.fileId;
+var userId = storage.userId;
+
+console.log("userId值");
+console.log(userId);
+
+document.getElementById("user-name").innerText = userName;
+
+/**
+ * 模块： 获取文件/文件夹列表
+ */
+
+var $fileTable = $('#file-table').bootstrapTable('destroy').bootstrapTable({
+    contentType:"application/x-www-form-urlencoded; charset=UTF-8",
+    url: '/kscd/api/general-storage/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'file_id',
+    striped: false,
+    cache: false,
+	sortName: 'file_id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: false,
+    //showRefresh   : true,
+    //showColumns   : true,
+    //toolbar: '#file-table-toolbar',
+    search: false,
+    strictSearch: true,
+    clickToSelect: false,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder,
+			'file_id': file_id
+        };
+        console.log("获取文件/文件夹列表时传给后台的参数：");
+        console.log(temp);
+        return temp;
+    },
+    columns: [
+        {
+            checkbox: true
+        },
+        { 
+        	title: '序号', 
+        	width: 50, 
+        	valign: "middle", 
+        	formatter: function (value, row, index) { 
+        		return index + 1; 
+        	} 
+        },
+        {
+            field: 'file_type',
+            title:'类型',
+            valign: 'middle',
+            width: 80,
+            formatter: fileTableType
+        },
+        {
+            field: 'name',
+            title:'名称',
+            valign: 'middle',
+            formatter: fileTableName
+        },{
+            field: 'size',
+            title:'大小',
+            width: '16%',
+            formatter: fileTableSize
+        },{
+            field: 'create_time',
+            title:'上传时间',
+            width: 200
+        },{
+            field: 'chg_time',
+            title:'最后修改时间',
+            width: 200
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+    	toastr.error("数据加载失败", "错误提示");
+    },
+    onClickedRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+function fileTableType(value, row, index){
+	   var result;
+	   if(value == 0){
+		   result = '<img src="/static/img/opened_folder.png">'
+	   }else{
+		   result = '<img src="/static/img/document.png">'
+	   }
+	   return result;
+}
+
+function fileTableName (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + row.file_id + ",'" + row.name + "')\" target=\"_self\">" + row.name + "</a>";
+   }else{
+      result = row.name;
+   }
+   
+   return result;
+}
+
+function fileTableSize (value, row, index) {
+   var result;
+   if(row.file_type == 0){
+      result = "--";
+   }else{
+      result = unitConversion(row.size);
+   }
+   return result;
+}
+
+function unitConversion(size){
+	if(size >= 1024 && size < (1024*1024)){
+		size = (size/1024).toFixed(2) + "K";
+	}else if(size >= (1024*1024) && size < (1024*1024*1024)){
+		size = (size/(1024*1024)).toFixed(2) + "M";
+	}else if(size >= (1024*1024*1024) && size < (1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024)).toFixed(2) + "G";
+	}else if(size >= (1024*1024*1024*1024) && size < (1024*1024*1024*1024*1024)){
+		size = (size/(1024*1024*1024*1024)).toFixed(2) + "T";
+	}else{
+		size += "B";
+	}
+	return size;
+}
+
+function setFileId(id, name){
+	   file_id = id;
+	   $fileTable.bootstrapTable("refresh");
+	   
+	   for(var i = 0; i<path_arr.length; i++){
+	      if(path_arr[i].file_id == id){
+	         path_arr.splice(i+1, path_arr.length-(i+1));
+	         var urlObjLen = path_arr.length;
+	         var urlPath = "";
+	         if(urlObjLen == 1){
+		     	urlPath += path_arr[0].name;
+		     	$("#base-path").html(urlPath);
+	         }else if(urlObjLen > 1){
+		        for(var i = 0; i < (urlObjLen-1); i++){
+			    	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+			    }
+		        urlPath += path_arr[urlObjLen-1].name;
+		        $("#base-path").html(urlPath);
+	         }
+	         return;
+	      }
+	   }
+	   
+	   path_arr.push({'file_id': id, 'name': name});
+	   var urlObjLen = path_arr.length;
+	   var urlPath = "";
+	   if(urlObjLen == 1){
+	     	urlPath += path_arr[0].name;
+	     	$("#base-path").html(urlPath); 
+	   }else if(urlObjLen > 1){
+		   for(var i = 0; i < (urlObjLen-1); i++){
+		   	urlPath += "<a href=\"javascript:void(0)\" onclick=\"setFileId(" + path_arr[i].file_id + ",'" + path_arr[i].name + "')\" target=\"_self\">" + path_arr[i].name + "</a>" + " > ";
+		   }
+	       urlPath += path_arr[urlObjLen-1].name;
+	       $("#base-path").html(urlPath);
+	   }
+}
+
+$("#download-button").click(function(){
+    var checkedFiles = $fileTable.bootstrapTable('getSelections');
+    var len = checkedFiles.length;
+
+    if(len > 0){
+    	for(var i = 0; i<len; i++){
+    	  if(Number(checkedFiles[i].file_type) == 0){
+    		  toastr.error("不能下载文件夹：" + checkedFiles[i].name, "错误提示");
+    	  }else{
+       		  var iframe = document.createElement("iframe");
+       		  iframe.style.display = "none"; // 防止影响页面
+       		  iframe.style.height = 0; // 防止影响页面
+       		  iframe.src = '/kscd/api/general-storage/download-file/?file_ids=' + checkedFiles[i].file_id + '&user_id=' + userId; 
+       		  document.body.appendChild(iframe); // 这一行必须，iframe挂在到dom树上才会发请求
+       		  // 5分钟之后删除
+       		  setTimeout(function(){
+       		    iframe.remove();
+       		  }, 5 * 60 * 1000); 
+    	  }
+    	}
+    }else{
+        toastr.error("请选择需要下载的文件", "错误提示");
+    }
+});
+</script>
+</body>
+</html>

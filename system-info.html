@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>系统信息</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+     <div class="main-right-in">
+     
+	<!-- =============================================== // content begin ====================================================== -->
+	<!-- // main begin -->
+	<table width="100%" border="0">
+		<tbody>
+		  <tr>
+		    <td width="50%" align="left" valign="top" style="padding-right: 5px;">
+		    	<!-- // left table begin -->
+					<table class="table table-bordered table-striped">
+						<tbody>
+							<tr>
+								<td style="width: 30%;">主机名称：</td>
+								<td style="width: 70%;" id="hostname"></td>
+							</tr>
+							<tr>
+								<td style="width: 30%;">硬件版本号：</td>
+								<td style="width: 70%;" id="version"></td>
+							</tr>
+							<tr style="height: 40px;">
+								<td>软件发行号：</td>
+								<td id="soft_publish"></td>
+							</tr>
+							
+							<tr>
+								<td>研制单位：</td>
+								<td id="company"></td>
+							</tr>
+						</tbody>
+					</table>
+				<!-- left table end // -->
+		    </td>
+		    <td align="left" valign="top" style="padding-left: 10px;">
+				    <!-- // right table begin -->
+					<table class="table table-bordered table-striped">
+							<tbody>
+								<tr>
+									<td>产品名称：</td>
+									<td id="product"></td>
+								</tr>
+								<tr>
+									<td>运行时长：</td>
+									<td id="runtime"></td>
+								</tr>
+								<tr>
+									<td style="width: 30%;">运行状态：</td>
+									<td style="width: 70%;"><i class="icon wb-large-point tooltip-success" id="status" title="" style="cursor: pointer"></i></td>
+								</tr>
+								<tr>
+									<td style="width: 30%;">用户在线数：</td>
+									<td style="width: 70%;" id="online-user-numbers"></td>
+								</tr>
+							</tbody>
+					</table>	
+					<!-- right table end // -->
+			    </td>
+			  </tr>
+			 </tbody>
+		</table>
+		<!-- main end // -->
+		<!-- =============================================== content end // ====================================================== -->
+
+     </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin ====================================================== -->
+{% include "dist/change-password.html" %}
+<!-- =============================================== all modal end // ====================================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+
+<script>
+$(function(){
+	/**
+	 * 获取系统信息
+	 */
+	$.ajax({
+		type: "GET",
+		url: "/kscd/api/system-info/sysinfo/",
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log("获取系统信息后台返回的全部数据");
+			console.log(data);
+			if(data.ret){
+				document.getElementById("hostname").innerText = data.sysinfo.hostname;
+				document.getElementById("version").innerText = data.sysinfo.version;
+				document.getElementById("soft_publish").innerText = data.sysinfo.soft_publish;
+				document.getElementById("company").innerText = data.sysinfo.company;
+				document.getElementById("product").innerText = data.sysinfo.product;
+				var status = data.sysinfo.status;
+				var statusDom = document.getElementById("status");
+				if(status == true){
+					statusDom.style.color = "#46be8a";
+					statusDom.title = "在线";
+				}else{
+					statusDom.style.color = "#ff0000";
+					statusDom.title = "离线";
+				}
+				
+				//解析时长
+				var runtimeDom = document.getElementById("runtime");
+			 	var runtime = '{{running_time}}'; //"13天7小时58分17秒";
+			 	runtimeDom.innerHTML = runtime;
+			 	var indexOfDay = runtime.indexOf("天");
+			 	var indexOfHour1 = runtime.indexOf("小");
+			 	var indexOfHour2 = runtime.indexOf("时");
+			 	var indexOfMinutes = runtime.indexOf("分");
+			 	var indexOfSecond = runtime.indexOf("秒");
+			 	var runtimeDay = runtime.substring(0, indexOfDay); 
+			 	var runtimeHour = runtime.substring(indexOfDay+1, indexOfHour1); 
+			 	var runtimeMinutes = runtime.substring(indexOfHour2+1, indexOfMinutes); 
+			 	var runtimeSecond = runtime.substring(indexOfMinutes+1, indexOfSecond); 
+			 	runtime = runtimeDay*24*60*60*1000 + runtimeHour*60*60*1000 + runtimeMinutes*60*1000 + runtimeSecond*1000;
+				setInterval(function(){				    
+				    var day = Math.floor(runtime/(24*60*60*1000));    
+				    var h = Math.floor((runtime%(24*60*60*1000))/(60*60*1000));    
+				    var m = Math.floor(((runtime%(24*60*60*1000))%(60*60*1000))/(60*1000));
+				    var s = Math.floor((((runtime%(24*60*60*1000))%(60*60*1000))%(60*1000))/1000);
+
+				    runtimeDom.innerHTML = day + "天" + h + "小时" + m + "分" + s + "秒 ";
+				    runtime += 1000;
+				}, 1000);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+	
+	/**
+	 * 获取用户在线数
+	 */
+	function getOnlineNumbers(){
+	    $.ajax({
+	        type: "GET",
+	        url: '/kscd/api/system-info/user-numbers/',
+	        data: {},
+	        dataType: "json",
+	        success: function(data){
+	        	console.log('查看用户在线数时后台返回的所有数据：');
+	        	console.log(data);
+	        	if(data.ret){
+	        		document.getElementById('online-user-numbers').innerText = data.user_num;
+	        	}else{
+	        		toastr.error(data.msg, "错误提示");
+	        	}
+	        },
+	        error: function(data){
+	        	toastr.error("连接失败", "错误提示");
+	        }
+	    });
+	}
+	
+	getOnlineNumbers();
+	
+	setInterval(function(){
+		getOnlineNumbers();
+	}, 1000*60);
+});
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

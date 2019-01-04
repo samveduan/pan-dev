@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>存储服务器管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+      	 <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+     	 <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+      	 <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+      	 <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+  </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+    <div class="main-right-in">
+      
+		<!-- =============================================== // content begin ====================================================== -->
+		<div class="botton-panel" id="server-table-toolbar">
+			<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" data-toggle="modal" id="create-server-button">
+		    	<i class="glyphicon glyphicon-folder-open"></i>
+		    	<span>&nbsp;创建</span>    
+		    </a>
+		    
+		    <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="edit-server-button">
+		    	<i class="glyphicon glyphicon-pencil"></i>
+		    	<span>编辑</span>   
+		    </a>
+		    
+		    <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="delete-server-button">
+		    	<i class="glyphicon glyphicon-minus"></i>
+		    	<span>删除</span>    
+		    </a>
+		</div>
+		    	
+		<!-- // main begin -->
+		<table id="server-table" data-toggle="table" class="table table-striped table-hover" style="border: 1px solid #d4d8da">
+		
+		</table>
+		<!-- main end // -->
+
+		<!-- =============================================== content end // ====================================================== -->
+
+    </div>
+</div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+
+<!-- // create server begin -->
+<div class="modal fade" id="create-server-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('create-server-modal-form')">
+							×						</button>
+						<h4 class="modal-title">创建存储服务器 </h4>
+					</div>
+					<form id="create-server-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="create-server-modal-name" name="createServerModalName" placeholder="" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">类型：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <select id="create-server-modal-type" name="createServerModalType" class="form-control">
+                                        <option value="1">密码机</option>
+                                    </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">IP：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="create-server-modal-ip" name="createServerModalIp" />
+                            </div>
+                        </div>
+                        
+						<!-- modal-body end // -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="create-server-modal-submit" type="submit">
+							确 定						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('create-server-modal-form')">
+							取 消						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- create server end // -->
+
+<!-- // edit server begin -->
+<div class="modal fade" id="edit-server-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('edit-server-modal-form')">
+							×						</button>
+						<h4 class="modal-title">编辑存储服务器 </h4>
+					</div>
+					<form id="edit-server-modal-form" method="post" class="form-horizontal" action="">
+                    <input type="hidden" id="edit-server-modal-id"/>
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-server-modal-name" name="editServerModalName" placeholder="" value=""/>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">类型：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <select id="edit-server-modal-type" name="editServerModalType" class="form-control" disabled>
+                                    </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal align-right">IP：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="edit-server-modal-ip" name="editServerModalIp" value=""/>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="edit-server-modal-submit" type="submit">
+							确 定						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('edit-server-modal-form')">
+							取 消						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- edit server end // -->
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 模块：浏览存储服务器
+ */
+var $serverTable = $('#server-table').bootstrapTable('destroy').bootstrapTable({
+    url: '/kscd/api/nas/',
+    method: 'GET',
+	dataType: "json",
+    uniqueId: 'id',
+    striped: false,
+    cache: false,
+	sortName: 'id',
+    sortable: true,
+    sortOrder: 'desc',
+    sidePagination: "server",
+    undefinedText: '--',
+    singleSelect: true,
+    //showRefresh   : true,
+    //showColumns   : true,
+    toolbar: '#server-table-toolbar',
+    search: true,
+    strictSearch: true,
+    clickToSelect: true,
+    pagination: true,
+    pageNumber:1,
+    pageSize:10,
+    pageList: [5, 10, 20, 50, 100],
+    paginationPreText:"上一页",
+    paginationNextText:"下一页",
+    //showToggle: true,
+    //cardView: false,
+    //detailView: false,
+    //showPaginationSwitch: true,
+	queryParamsType : "",
+    queryParams : function (params) {
+        var temp = {
+			'pageSize' : params.pageSize,
+			'pageNumber' : params.pageNumber,
+			'searchText': params.searchText,
+			'sortName': params.sortName,
+			'sortOrder': params.sortOrder
+        };
+        console.log("获取服务器列表时传给后台的参数：");
+		console.log(params);
+        return temp;
+    },
+    columns: [
+        {
+        	checkbox: true
+        },{
+	        field: 'name',
+	        title:'名称',
+	        valign: 'middle',
+	        width: '16%'
+        },{
+	        field: 'nastype',
+	        title:'类型',
+	        width: '16%',
+	        formatter: serverTableType
+        },{
+	        field: 'ip',
+	        title:'IP'
+        }
+    ],
+    onLoadSuccess: function () {
+        //alert('表格加载成功！');
+    },
+    onLoadError: function () {
+        toastr.error("数据加载失败！", "错误提示");
+    },
+    onClickRow: function (row, $element) {
+        var id = row.ID;
+        //EditViewById(id, 'view');
+        console.log("点击所在行的信息");
+        console.log(row);
+        console.log($element);
+    }
+});
+
+function serverTableType(value, row, index){
+	var result;
+	if(row.nastype == "0"){
+		result = '密码机';
+	}else if(row.nastype == "1"){
+		result = '密码机';
+	}else if(row.nastype == "2"){
+		result = '密码机'
+	}else if(row.nastype == "3"){
+		result = '密码机'
+	}
+	return result;
+}
+
+/**
+ * 模块：创建服务器
+ */
+
+$("#create-server-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				$("#create-server-modal").modal("show");
+			}else{
+				toastr.error('对不起，您没有权限创建存储服务器', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+$('#create-server-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	createServerModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },				
+                threshold: 6, 
+                remote: {
+                    url: '/kscd/api/nas/check-name/',
+                    message: '名称已存在',
+                    delay:  1000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({name: $('#create-server-modal-name').val()});
+                    }
+                },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线或中英文 括号'
+				}
+            }
+        },
+        createServerModalType: {
+            message: '类型无效',
+            validators: {
+                notEmpty: {
+                    message: '类型不能为空'
+                }
+            }
+        },
+        createServerModalIp: {
+            message: 'IP无效',
+            validators: {
+                notEmpty: {
+                    message: 'IP不能为空'
+                },
+                threshold: 6, 
+                remote: {
+                    url: '/kscd/api/nas/check-ip/',
+                    message: 'IP已存在',
+                    delay:  1000,
+                    type: 'POST',
+                    data: function(validator) {
+                    	return JSON.stringify({ip: $('#create-server-modal-ip').val()});
+                    }
+                },
+                regexp: {
+                    regexp: /^(\d|\d\d|1\d\d|2[0-4]\d|25[0-5])(?:\.(\d|\d\d|1\d\d|2[0-4]\d|25[0-5])){3}$/,
+                    message: '请输入正确的IP'
+                }
+            }
+        }
+    }
+})
+.on('success.form.bv', function(e) {
+	e.preventDefault();
+	//param request:
+	var name = $("#create-server-modal-name").val();
+	var type = $("#create-server-modal-type").val();
+	var ip = $("#create-server-modal-ip").val();
+	var params = JSON.stringify({name: name, nastype: type, ip: ip, port: 8080});
+	console.log("创建服务器时传给后台的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/nas/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("创建服务器时后台返回的参数");
+			console.log(data);
+			if(data.ret){
+				$("#create-server-modal-form")[0].reset();
+				$("#create-server-modal-form").data('bootstrapValidator').resetForm();
+				$("#create-server-modal").modal("hide");
+				toastr.success("创建服务器成功", "成功提示");
+				$serverTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：编辑服务器
+ */
+
+$("#edit-server-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				// begin
+				var checkedServer = $serverTable.bootstrapTable('getSelections');
+				console.log(checkedServer);
+				var len = checkedServer.length;
+				if(len == 0){
+					toastr.error("请选择需要编辑的服务器", "错误提示");
+				}else if(len == 1){
+					$("#edit-server-modal").modal({
+			            show: true,
+			            backdrop:'static'
+			        });
+					$("#edit-server-modal-id").val(checkedServer[0].id);
+					$("#edit-server-modal-name").val(checkedServer[0].name);
+					var nastype = checkedServer[0].nastype;
+					if(Number(nastype) == 0){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 1){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 2){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 3){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 4){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 5){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}else if(Number(nastype) == 6){
+						$("#edit-server-modal-type").html("<option value='" + nastype + "'>" + "密码机" + "</option>");
+					}
+					$("#edit-server-modal-ip").val(checkedServer[0].ip);
+				}else if(len > 1){
+					toastr.error("一次只能编辑一个服务器", "错误提示");
+				}
+				//end
+			}else{
+				toastr.error('对不起，您没有权限编辑存储服务器', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+$('#edit-server-modal-form').bootstrapValidator({
+    message: 'This value is not valid',
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+    	editServerModalName: {
+            message: '名称无效',
+            validators: {
+                notEmpty: {
+                    message: '名称不能为空'
+                },
+                 threshold: 6, 
+                 remote: {
+                     url: '/kscd/api/nas/check-name/',
+                     message: '名称已存在',
+                     delay:  1000,
+                     type: 'POST',
+                     data: function(validator) {
+                     	return JSON.stringify({id: $("#edit-server-modal-id").val(), name: $('#edit-server-modal-name').val()});
+                     }
+                 },
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+            }
+        },
+        editServerModalType: {
+            message: '类型无效',
+            validators: {
+                notEmpty: {
+                    message: '类型不能为空'
+                }
+            }
+        },
+        editServerModalIp: {
+            message: 'IP无效',
+             threshold: 6, 
+             remote: {
+                 url: '/kscd/api/nas/check-ip/',
+                 message: 'IP已存在',
+                 delay:  1000,
+                 type: 'POST',
+                 data: function(validator) {
+                 	return JSON.stringify({id: $("#edit-server-modal-id").val(), ip: $('#edit-server-modal-ip').val()});
+                 }
+             },
+            validators: {
+                notEmpty: {
+                    message: 'IP不能为空'
+                },
+                regexp: {
+                    regexp: /^(\d|\d\d|1\d\d|2[0-4]\d|25[0-5])(?:\.(\d|\d\d|1\d\d|2[0-4]\d|25[0-5])){3}$/,
+                    message: '请输入正确的IP'
+                }
+            }
+        }
+    }
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	//修改存储器信息：管理员能够修改存储服务器的 IP、存储服务器名称
+	//param id: 被修改的存储器id
+	var id = $("#edit-server-modal-id").val();
+	var name = $("#edit-server-modal-name").val();
+	var ip = $("#edit-server-modal-ip").val();
+	var params = JSON.stringify({name: name, ip: ip});
+	$.ajax({
+		type: "PATCH",
+		url: '/kscd/api/nas/' + id + "/",
+		data: params,
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			console.log(data);
+			if(data.ret){
+				$("#edit-server-modal-form")[0].reset();
+				$("#edit-server-modal-form").data('bootstrapValidator').resetForm();
+				$("#edit-server-modal").modal("hide");
+				toastr.success("编辑服务器成功", "成功提示");
+				$serverTable.bootstrapTable("refresh");
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：删除服务器
+ */
+
+function deleteServer(){	
+	var checkedServers = $serverTable.bootstrapTable('getSelections');
+	var len = checkedServers.length;
+	if(len == 0){
+		toastr.error("请选择需要删除的服务器", "错误提示");
+	}else if(len >1){
+		var idArray = [];
+		for(var i = 0; i<len; i++){
+			idArray.push(checkedServers[i].id);
+		}
+		console.log(idArray);
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/nas/',
+			data: JSON.stringify({ids: idArray}),
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log('删除服务器提交数据成功时从后台返回的数据');
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除服务器成功", "正确提示");
+					$serverTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}else if(len == 1){
+		console.log('/kscd/api/nas/' +  checkedServers[0].id);
+		$.ajax({
+			type: "DELETE",
+			url: '/kscd/api/nas/' +  checkedServers[0].id,
+			data: {},
+			dataType: "json",
+			contentType: 'application/json',
+			success: function(data){
+				console.log('删除服务器提交数据成功时从后台返回的数据');
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除服务器成功", "正确提示");
+					$serverTable.bootstrapTable("refresh");
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+			},
+			error: function(data){
+				toastr.error("连接失败", "错误提示");
+			}
+		});
+	}
+}
+
+$("#delete-server-button").click(function(){
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/admin/check-permission/',
+		data: {},
+		dataType: "json",
+		contentType: 'application/json',
+		success: function(data){
+			if(data.ret){
+				deleteServer();
+			}else{
+				toastr.error('对不起，您没有权限删除存储服务器', "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：重置表单
+ */
+ 
+function clearValidate(formId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+}
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>

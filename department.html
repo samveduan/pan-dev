@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>部门管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="/static/libs/web-icons/web-icons.css">
+<link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-table-master/bootstrap-table.css">
+<link rel="stylesheet" href="/static/libs/toastr/css/toastr.css">
+<link rel="stylesheet" href="/static/css/common/base.css">
+<link rel="stylesheet" href="/static/libs/bootstrap-validator/css/bootstrapValidator.css">
+<link rel="stylesheet" href="/static/libs/ztree/css/metroStyle/metroStyle_adm.css" type="text/css">
+</head>
+
+<body>
+{% include "dist/head-adm.html" %}
+    
+<!-- // left menu begin -->
+<div class="main-left">
+   	<ul class="main-left-menu">
+   		 <li><a href="/kscd/system-info/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-desktop" aria-hidden="true"></span> 系统信息</a></li>
+      	 <li><a href="/kscd/dept/" target="_self" role="tab" aria-expanded="true" class="main-left-menu-active"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> 部门管理</a></li>
+         <li><a href="/kscd/user/" target="_self" role="tab" aria-expanded="true"><span class="icon wb-users" aria-hidden="true"></span> 用户管理</a></li>
+         <li><a href="/kscd/admin/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> 管理员管理</a></li>
+         <li><a href="/kscd/share-group/" target="_self" role="tab" aria-expanded="true"><span class="fa fa-users" aria-hidden="true"></span> 共享组管理</a></li>
+         <li><a href="/kscd/nas/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 存储服务器管理</a></li>
+         <li><a href="/kscd/log/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> 审计日志管理</a></li>
+         <li><a href="/kscd/system-manage/" target="_self" role="tab" aria-expanded="true"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 系统管理</a></li>
+     </ul>
+</div>
+<!-- left menu end // -->
+
+<!-- // right begin -->
+<div class="main-right">
+     <div class="main-right-in">
+     	<!-- =============================================== // content begin ====================================================== -->
+		<div class="botton-panel">
+		 	<a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="add-department">
+		     	<i class="glyphicon glyphicon-folder-open"></i>
+		     	<span>&nbsp;创建</span>
+		     </a>
+		     
+ 		     <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="move-department">
+ 		     	<i class="glyphicon glyphicon-sort"></i>
+ 		     	<span>移动</span>
+ 		     </a>
+
+			 <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="move-up-department">
+		     	<i class="glyphicon glyphicon-arrow-up"></i>
+		     	<span>上移</span>
+		     </a>
+		     
+		     <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" id="move-down-department">
+		     	<i class="glyphicon glyphicon-arrow-down"></i>
+		     	<span>下移</span>
+		     </a>
+		     
+		     <a class="btn btn-success" href="#" role="button" style="color:#ffffff;" onClick="delDepartment()">
+		     	<i class="glyphicon glyphicon-minus"></i>
+		     	<span>删除</span>
+		     </a>
+		</div>
+
+		<!-- // main begin -->
+		<table class="table table-bordered">
+			  <tr>
+			    <td width="228" align="left" valign="top" class="padding-top-10">
+			    	<!-- // left table begin -->
+			    	<ul id="department-tree" class="ztree"></ul>
+			    	<!-- // left table end -->
+			    </td>
+			    <td align="left" valign="top" class="padding-top-20">
+				    <!-- // right table begin -->
+		            <div class="col-lg-10 col-md-10 col-sm-10 col-lg-offset-2 col-md-offset-2 col-sm-offset-2" style="margin-left: 16.66666667%;">
+		                <form id="edit-department-form" method="post" class="form-horizontal" action="">
+		                    <div class="form-group">
+		                        <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">部门名称：</label>
+		                        <div class="col-lg-5 col-md-5 col-sm-5">
+		                            <input type="text" class="form-control" name="editDepartmentName" id="edit-department-name" value=""/>
+		                        </div>
+		                    </div>
+		                    
+		                    <div class="form-group">
+		                        <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">存储服务器：</label>
+		                        <div class="col-lg-5 col-md-5 col-sm-5">
+		                            <select name="editDepartmentServer" id="edit-department-server" class="form-control" validation="required" alsovalid="true" disabled>
+		                            </select>
+		                        </div>
+		                    </div>
+		                    
+<!-- 		                    <div class="form-group"> -->
+<!-- 		                        <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">排序：</label> -->
+<!-- 		                        <div class="col-lg-5 col-md-5 col-sm-5"> -->
+<!-- 		                            <input type="text" class="form-control" name="editDepartmentSort" id="edit-department-sort" value=""/> -->
+<!-- 		                        </div> -->
+<!-- 		                    </div> -->
+		                    
+		                    <div class="form-group">
+		                        <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">独立部门：</label>
+		                        <div class="col-lg-5 col-md-5 col-sm-5">
+		                            <input type="checkbox" name="editDepartmentIndependent" id="edit-department-independent" value="" style="margin-top: 11px; cursor: pointer"/>
+		                        </div>
+		                    </div>
+		
+		                    <div class="form-group">
+		                        <label class="col-lg-3 col-md-3 col-sm-3 control-label font-normal" style="text-align: right;">描述：</label>
+		                        <div class="col-lg-5 col-md-5 col-sm-5">
+		                            <textarea type="password" class="form-control" name="editDepartmentDescribe" id="edit-department-describe" rows="6"></textarea>
+		                            <span class="help-block"></span>
+		                        </div>
+		                    </div>
+		
+		                    <div class="form-group">
+		                        <div class="col-lg-9 col-md-9 col-sm-9 col-lg-offset-3 col-md-offset-3 col-sm-offset-3" style="margin-left: 25%;">
+								<button class="btn btn-success" id="edit-department-submit" type="submit" style="margin-right: 10px;">
+									保存
+								</button> 
+		                        </div>
+		                    </div>
+		                </form>
+		            </div>
+				<!-- right table end // -->
+			    </td>
+			  </tr>
+		</table>
+		<!-- main end // -->
+		<!-- =============================================== content end // ====================================================== -->
+     </div>
+ </div>
+<!-- right end // -->
+
+<!-- =============================================== // all modal begin =============================================== -->
+
+<!-- // add department begin -->
+<div class="modal fade" id="add-department-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-create">
+		<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('add-department-modal-form', 'add-department-modal-parent-dept-tree')">
+							×
+						</button>
+						<h4 class="modal-title"> 新增部门 </h4>
+					</div>
+					<form id="add-department-modal-form" method="post" class="form-horizontal" action="">
+					<div class="modal-body">		
+						<!-- // modal-body begin -->
+						 
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">名称：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="text" class="form-control" id="add-department-modal-name" name="addDepartmentModalName" placeholder="" />
+                            </div>
+                        </div>
+
+                        <div class="form-group" >
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">上级部门：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5" style="position:relative;z-index:9999999;" id="add-department-modal-parent-dept-div">
+                                <input type="text" class="form-control" name="addDepartmentModalParentDept" id="add-department-modal-parent-dept" onFocus="this.blur();" onClick="addDeptShowMenu();"/>
+                                <div id="add-department-modal-parent-dept-content" class="ztree-content">
+                                    <ul id="add-department-modal-parent-dept-tree" class="ztree ztree-modal"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">存储服务器：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                    <select name="addDepartmentModalServer" id="add-department-modal-server" class="form-control">
+
+                                    </select>
+                            </div>
+                        </div>
+                        
+<!--                         <div class="form-group"> -->
+<!--                             <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">排序：</label> -->
+<!--                             <div class="col-lg-5 col-md-5 col-sm-5"> -->
+<!--                                 <input type="text" class="form-control" name="addDepartmentModalSort" id="add-department-modal-sort" value="0"/> -->
+<!--                             </div> -->
+<!--                         </div> -->
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">是否为独立部门：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <input type="checkbox" name="addDepartmentModalIndependent" id="add-department-modal-independent" style="margin-top: 11px; cursor: pointer"/>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">描述：</label>
+                            <div class="col-lg-5 col-md-5 col-sm-5">
+                                <textarea type="text" class="form-control" name="addDepartmentModalDescribe" id="add-department-modal-describe" row="6"></textarea>
+                            </div>
+                        </div>
+                        
+						<!-- // modal-body end -->
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-success"  id="add-department-modal-submit" type="submit">
+							确 定
+						</button>
+						<button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('add-department-modal-form', 'add-department-modal-parent-dept-tree')">
+							取 消
+						</button>
+					</div>
+			</form>
+		</div><!-- /Modal -->
+	</div>
+</div><!-- // add department end -->
+
+<!-- // move department begin -->
+<div class="modal fade" id="move-department-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-create">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="clearValidate('move-department-modal-form', 'move-department-modal-parent-dept-tree')">
+                    ×
+                </button>
+                <h4 class="modal-title"> 移动部门 </h4>
+            </div>
+            <form id="move-department-modal-form" method="post" class="form-horizontal" action="">
+                <div class="modal-body">
+                    <!-- // modal-body begin -->
+
+                    <div class="form-group" >
+                        <label class="col-lg-4 col-md-4 col-sm-4 control-label font-normal" style="text-align: right;">移动至：</label>
+                        <div class="col-lg-5 col-md-5 col-sm-5" style="position:relative;z-index:9999999;" id="move-department-modal-parent-dept-div">
+                            <input type="text" class="form-control" name="moveDepartmentModalParentDept" id="move-department-modal-parent-dept" onFocus="this.blur();" onClick="moveDeptShowMenu();"/>
+                            <div id="move-department-modal-parent-dept-content" class="ztree-content">
+                                <ul id="move-department-modal-parent-dept-tree" class="ztree ztree-modal"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- // modal-body end -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success"  id="move-department-modal-submit" type="submit">
+                        确 定
+                    </button>
+                    <button class="btn btn-default" type="button" data-dismiss="modal" onClick="clearValidate('move-department-modal-form', 'move-department-modal-parent-dept-tree')">
+                        取 消
+                    </button>
+                </div>
+            </form>
+        </div><!-- /Modal -->
+    </div>
+</div><!-- // move department end -->
+
+{% include "dist/change-password.html" %}
+
+<!-- =============================================== all modal end // =============================================== -->
+
+<script src="/static/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/libs/bootstrap/js/bootstrap.js"></script>
+<script src="/static/libs/bootstrap-table-master/bootstrap-table.js"></script>
+<script src="/static/libs/bootstrap-table-master/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/static/libs/toastr/js/toastr.min.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.core-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.excheck-3.5.js"></script>
+<script src="/static/libs/ztree/js/jquery.ztree.exhide-3.5.js"></script>
+<script src="/static/libs/sha1.js"></script>
+<script>
+/**
+ * 模块：部门树
+ */
+ 
+var chosenDeptId = ""; //部门id
+var chosenDeptPid = ""; //部门pid
+var chosenDeptName = ""; //部门name
+var chosenDeptDescription = ""; //部门描述
+var chosenNode = {}; //选择的节点
+var chosenDeptIdForAddTree = ""; //添加部门的上级部门id
+var chosenDeptIdForMoveTree = ""; //移动部门的上级部门id
+ 
+//配置部门树
+var departmentTreeSetting = {
+	data: {
+		simpleData: {
+			enable: true
+		}
+	},
+    callback: {
+        onClick: function onClick(event, treeId, treeNode) {			
+       		$("#edit-department-form")[0].reset();
+    		$("#edit-department-form").data('bootstrapValidator').resetForm();
+
+	     	chosenDeptId = treeNode.id;
+			console.log("查看部门点击某一节点时的id");
+			console.log(chosenDeptId);
+			
+			chosenDeptPid = treeNode.dept_pid;
+			console.log("查看部门点击某一节点时的pid");
+			console.log(chosenDeptPid);
+			
+			chosenDeptName = treeNode.name;
+			console.log("查看部门点击某一节点时的name");
+			console.log(chosenDeptName);
+			
+			chosenDeptDescription = treeNode.description;
+			console.log("查看部门点击某一节点时的description");
+			console.log(chosenDeptDescription);
+			
+			chosenNode = treeNode;
+			console.log("查看部门点击某一节点时的详细信息");
+			console.log(chosenNode);
+			
+            setDeptEditSubmitStatus();
+
+     		$("#edit-department-name").val(treeNode.name);
+     		if(treeNode.nas_name){
+     			$("#edit-department-server").html('<option value="' + treeNode.nas_id +'">' + treeNode.nas_name + '</option>');
+     		}else{
+     			$("#edit-department-server").html('<option value="' + treeNode.nas_id +'">' + '' + '</option>');
+     		}
+     		//$("#edit-department-sort").val(treeNode.weight);
+     		var independent = Number(treeNode.independent);
+     		if(independent == 1){
+     			$("#edit-department-independent").prop("checked", true);
+     		}else if(independent == 0){
+     			$("#edit-department-independent").prop("checked", false);
+     		}
+     		$("#edit-department-describe").val(treeNode.description);
+     	}
+	}
+};
+
+// 定义初始化部门树函数
+function initDepartmentTree(){
+    $.ajax({
+        type: "GET",
+        url: '/kscd/api/dept/',
+        data: {},
+        dataType: "json",
+        success: function(data){
+			console.log("初始化部门树");
+			console.log(data);
+			if(data.ret){
+				$.fn.zTree.init($("#department-tree"), departmentTreeSetting, data.depts);
+				var treeObj = $.fn.zTree.getZTreeObj("department-tree"); 
+				treeObj.expandAll(true); 
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+        },
+        error: function(data){
+            toastr.error("连接失败", "错误提示");
+        }
+    });
+}
+
+/**
+ * 模块：编辑部门，当没有选择部门时，部门编辑表单输入元素被禁用
+ */
+ 
+function setDeptEditSubmitStatus(){
+	if(chosenDeptId == ""){
+		$("#edit-department-form").find('input,textarea,select').empty();
+        $("#edit-department-form").find('input,textarea,select,button').attr('disabled',true);
+	}else{
+        $("#edit-department-form").find('input,textarea,select,button').attr('disabled',false);
+    }
+}
+
+$('#edit-department-form').bootstrapValidator({
+	message : 'This value is not valid',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	fields : {
+		editDepartmentName : {
+			message : '名称无效',
+			validators : {
+				notEmpty : {
+					message : '名称不能为空'
+				},
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+			}
+		},
+		editDepartmentSort : {
+			message : '排序无效',
+			validators : {
+				notEmpty : {
+					message : '排序数字不能为空'
+				},
+				regexp : {
+					regexp : /^((0)|([1-9][0-9]*))$/,
+					message : '排序数字只能为0或正整数'
+				}
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	var dept_pid = chosenDeptPid;
+	var dept_name = $("#edit-department-name").val();
+	//var dept_weight = $("#edit-department-sort").val();
+	var dept_independent;
+	if($("#edit-department-independent").is(":checked")){
+		dept_independent = 1;
+	}else{
+		dept_independent = 0;
+	}
+	var dept_description = filterHtml($("#edit-department-describe").val()).substring(0, 128);
+	//var params = JSON.stringify({dept_pid: dept_pid, dept_name: dept_name, weight: dept_weight, description: dept_description, independent: dept_independent});
+	var params = JSON.stringify({dept_pid: dept_pid, dept_name: dept_name, description: dept_description, independent: dept_independent});
+	console.log("编辑部门时传给后台的参数");
+	console.log(params);
+	$.ajax({
+		type: "PATCH",
+		url: '/kscd/api/dept/' + chosenDeptId + '/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("编辑部门提交数据成功时后台返回的数据");
+			console.log(data);
+			if(data.ret){
+				toastr.success("编辑部门成功！", "成功提示");
+				initDepartmentTree();
+				//$("#edit-department-form")[0].reset();
+				$("#edit-department-form").data('bootstrapValidator').resetForm();
+				//chosenDeptId = "";
+				//chosenDeptPid = "";
+				//chosenDeptName = "";
+				//chosenDeptDescription = "";
+				//setDeptEditSubmitStatus();
+				
+				setTimeout(function(){
+// 					var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+// 		            deptTree.selectNode(chosenNode);
+// 		            var a = $("#" + chosenNode.tId + "_a");
+// 		            a.addClass("cur");
+		            
+					var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+					var getAddedNode = deptTree.getNodeByParam("id", chosenDeptId, null);
+					
+					deptTree.selectNode(getAddedNode);
+		            var currentNode = $("#" + getAddedNode.tId + "_a");
+		            currentNode.addClass("cur");
+		            
+				}, 500);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：创建部门
+ */
+ 
+//配置创建部门下拉树
+var addDeptTreeSetting = {
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+			$("#add-department-modal-parent-dept").val(treeNode.name).change();
+			chosenDeptIdForAddTree = treeNode.id;
+			console.log("创建部门时选择的父部门id");
+			console.log(chosenDeptIdForAddTree);
+		}
+	}
+};
+
+function addDeptShowMenu() {
+	var parentDept = $("#add-department-modal-parent-dept");
+	var parentDeptOffset = $("#add-department-modal-parent-dept").offset();
+	$("#add-department-modal-parent-dept-content").css({
+		right : -10 + "px",
+		top : (parentDept.outerHeight() + 5) + "px"
+	}).slideDown("fast");
+	
+	var treeObj = $.fn.zTree.getZTreeObj("add-department-modal-parent-dept-tree"); 
+	treeObj.expandAll(true); 
+
+	$("body").bind("mousedown", onAddDeptBodyDown);
+}
+
+function addDeptHideMenu() {
+	$("#add-department-modal-parent-dept-content").fadeOut("fast");
+	$("body").unbind("mousedown", onAddDeptBodyDown);
+}
+
+function onAddDeptBodyDown(event) {
+	if (!(event.target.id == "menuBtn"
+			|| event.target.id == "add-department-modal-parent-dept"
+			|| event.target.id == "add-department-modal-parent-dept-content" || $(event.target).parents(
+			"#add-department-modal-parent-dept-content").length > 0)) {
+		addDeptHideMenu();
+	}
+}
+
+//创建部门
+$("#add-department").click(function(){
+    $("#add-department-modal").modal("show");
+    $.ajax({
+        type: "GET",
+        url: '/kscd/api/dept/',
+        data: {},
+        dataType: "json",
+        success: function(data){
+			console.log("创建部门时获取到的部门树");
+			console.log(data);
+			if(data.ret){
+				$.fn.zTree.init($("#add-department-modal-parent-dept-tree"), addDeptTreeSetting, data.depts);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+        },
+        error: function(data){
+            toastr.error("连接失败", "错误提示");
+        }
+    });
+	
+	$.ajax({
+		type: "GET",
+		url: '/kscd/api/nas/',
+		data: {},
+		dataType: "json",
+		success: function(data){
+			console.log("创建部门时获取到的存储服务器");
+			console.log(data);
+			if(data.ret){
+				var len = data.nases.length;
+				var options = '';
+				for(var i = 0; i<len; i++){
+					options += "<option value='" + data.nases[i].id + "'>" + data.nases[i].name + "</option>";
+				}
+				$("#add-department-modal-server").html(options);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+$('#add-department-modal-form').bootstrapValidator({
+	message : 'This value is not valid',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	excluded:[":disabled"],
+	fields : {
+		addDepartmentModalName : {
+			message : '名称无效',
+			validators : {
+				notEmpty : {
+					message : '名称不能为空'
+				},
+				regexp : {
+					regexp : /^[a-zA-Z0-9_()（）\u4e00-\u9fa5]{2,32}$/,
+					message : '名称为2至32位汉字、字母、数字、下滑线或中英文括号'
+				}
+			}
+		},
+		addDepartmentModalParentDept : {
+			message : '上级部门不能为空',
+			trigger:"change",
+			validators : {
+				notEmpty : {
+					message : '上级部门不能为空'
+				}
+			}
+		},
+		addDepartmentModalServer : {
+			message : '存储服务器无效',
+			validators : {
+				notEmpty : {
+					message : '存储服务器不能为空'
+				}
+			}
+		},
+		addDepartmentModalSort : {
+			message : '排序数字无效',
+			validators : {
+				notEmpty : {
+					message : '排序数字不能为空'
+				},
+				regexp : {
+					regexp : /^((0)|([1-9][0-9]*))$/,
+					message : '排序数字只能为0或正整数'
+				}
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	var dept_name = $("#add-department-modal-name").val();
+	var dept_pid = chosenDeptIdForAddTree;
+	var nas_id = $("#add-department-modal-server").val();
+	//var weight = $("#add-department-modal-sort").val();
+	var dept_independent;
+	if($("#add-department-modal-independent").is(":checked")){
+		dept_independent = 1;
+	}else{
+		dept_independent = 0;
+	}
+	var description = filterHtml($("#add-department-modal-describe").val()).substring(0, 128);
+	//params = JSON.stringify({dept_name: dept_name, dept_pid: dept_pid, nas_id: nas_id, description: description, weight: weight, independent: dept_independent});
+	params = JSON.stringify({dept_name: dept_name, dept_pid: dept_pid, nas_id: nas_id, description: description, independent: dept_independent});
+
+	console.log("创建部门时的参数");
+	console.log(params);
+	$.ajax({
+		type: "POST",
+		url: '/kscd/api/dept/',
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("添加部门提交数据成功时返回的值");
+			console.log(data);
+			if(data.ret){
+				$("#add-department-modal-form")[0].reset();
+				$("#add-department-modal-form").data('bootstrapValidator').resetForm();
+				$("#add-department-modal").modal("hide");
+				toastr.success("新增部门成功", "成功提示");
+				initDepartmentTree();
+
+				$("#edit-department-form")[0].reset();
+				$("#edit-department-form").data('bootstrapValidator').resetForm();
+				
+				setTimeout(function(){
+					var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+					var getAddedNode = deptTree.getNodeByParam("id", data.dept.id, null);
+					
+					deptTree.selectNode(getAddedNode);
+		            var currentNode = $("#" + getAddedNode.tId + "_a");
+		            currentNode.addClass("cur");
+		            
+					chosenDeptId = data.dept.id; //部门id
+					chosenDeptPid = getAddedNode.dept_pid; //部门pid
+					chosenDeptName = getAddedNode.name; //部门name
+					chosenDeptDescription = getAddedNode.description; //部门描述
+					chosenNode = getAddedNode; //选择的节点
+					chosenDeptIdForAddTree = "";
+		            
+		            setDeptEditSubmitStatus();
+
+		     		$("#edit-department-name").val(data.dept.dept_name);
+					$("#edit-department-server").html('<option value="' + data.dept.nas_id +'">' + data.dept.nas_name + '</option>');
+		     		//$("#edit-department-sort").val(data.dept.weight);
+		     		var independent = Number(data.dept.independent);
+		     		if(independent == 1){
+		     			$("#edit-department-independent").prop("checked", true);
+		     		}else if(independent == 0){
+		     			$("#edit-department-independent").prop("checked", false);
+		     		}
+		     		$("#edit-department-describe").val(data.dept.description); 
+				}, 1000);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块：移动部门
+ */
+ 
+//移动部门下拉树配置 
+var moveDeptTreeSetting = {
+    data : {
+        simpleData : {
+            enable : true
+        }
+    },
+    callback : {
+        onClick: function onClick(event, treeId, treeNode) {
+            $("#move-department-modal-parent-dept").val(treeNode.name).change();
+			console.log("移动部门时选择的上级部门的节点信息");
+			console.log(treeNode);
+			console.log("移动部门时选择的上级部门的节点id");
+			chosenDeptIdForMoveTree = treeNode.id;
+			console.log(chosenDeptIdForMoveTree);
+        }
+    }
+};
+
+function moveDeptShowMenu() {
+    var parentDept = $("#move-department-modal-parent-dept");
+    var parentDeptOffset = $("#move-department-modal-parent-dept").offset();
+    $("#move-department-modal-parent-dept-content").css({
+        right : -10 + "px",
+        top : (parentDept.outerHeight() + 5) + "px"
+    }).slideDown("fast");
+	
+	var treeObj = $.fn.zTree.getZTreeObj("move-department-modal-parent-dept-tree"); 
+	treeObj.expandAll(true); 
+
+    $("body").bind("mousedown", onMoveDeptBodyDown);
+}
+
+function moveDeptHideMenu() {
+    $("#move-department-modal-parent-dept-content").fadeOut("fast");
+    $("body").unbind("mousedown", onMoveDeptBodyDown);
+}
+
+function onMoveDeptBodyDown(event) {
+    if (!(event.target.id == "menuBtn"
+            || event.target.id == "move-department-modal-parent-dept"
+            || event.target.id == "move-department-modal-parent-dept-content" || $(event.target).parents(
+                "#move-department-modal-parent-dept-content").length > 0)) {
+        moveDeptHideMenu();
+    }
+}
+
+//移动部门
+
+$("#move-department").click(function(){
+    if(chosenDeptId){
+        $("#move-department-modal").modal("show");
+        $.ajax({
+            type: "GET",
+            url: '/kscd/api/dept/',
+            data: {},
+            dataType: "json",
+            success: function(data){
+				console.log("移动部门时加载的下拉树");
+				console.log(data);
+				if(data.ret){
+                	$.fn.zTree.init($("#move-department-modal-parent-dept-tree"), moveDeptTreeSetting, data.depts);
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+            },
+            error: function(data){
+                toastr.error("连接失败", "错误提示");
+            }
+        });
+    }else{
+        toastr.error("请先选择需要移动的部门", "错误提示");
+    }
+});
+
+$('#move-department-modal-form').bootstrapValidator({
+	message : 'This value is not valid',
+	feedbackIcons : {
+		valid : 'glyphicon glyphicon-ok',
+		invalid : 'glyphicon glyphicon-remove',
+		validating : 'glyphicon glyphicon-refresh'
+	},
+	excluded:[":disabled"],
+	fields : {
+		moveDepartmentModalParentDept : {
+			message : '部门不能为空',
+			trigger:"change",
+			validators : {
+				notEmpty : {
+					message : '部门不能为空'
+				}
+			}
+		}
+	}
+}).on('success.form.bv', function(e) {
+	e.preventDefault();
+	
+	var dept_pid = chosenDeptIdForMoveTree;
+	var dept_name = $("#edit-department-name").val();
+	//var dept_weight = $("#edit-department-sort").val();
+	var dept_independent;
+	if($("#edit-department-independent").is(":checked")){
+		dept_independent = 1;
+	}else{
+		dept_independent = 0;
+	}
+	var dept_description = filterHtml($("#edit-department-describe").val()).substring(0, 128);
+
+	//var params = JSON.stringify({dept_pid: dept_pid, dept_name: dept_name, weight: dept_weight, independent: dept_independent, description: dept_description});
+	var params = JSON.stringify({dept_pid: dept_pid, dept_name: dept_name, independent: dept_independent, description: dept_description});
+
+	if(chosenDeptPid == chosenDeptIdForMoveTree){
+		toastr.error("目标部门和当前部门的父部门一致", "错误提示");
+		return;
+	}else if(chosenDeptId == chosenDeptIdForMoveTree){
+		toastr.error("目标部门和当前部门一致", "错误提示");
+		return;
+	}
+	console.log("移动部门时传给后台的参数");
+	console.log(params);
+	
+	var url = '/kscd/api/dept/' + chosenDeptId + '/';
+	console.log("移动部门时的url");
+	console.log(url);
+	
+	$.ajax({
+		type: "PATCH",
+		url: url,
+		data: params,
+		dataType: "json",
+		success: function(data){
+			console.log("编辑部门提交数据成功时后台返回的数据");
+			console.log(data);
+			if(data.ret){
+				$("#move-department-modal-form")[0].reset();
+				$("#move-department-modal-form").data('bootstrapValidator').resetForm();
+				$("#move-department-modal").modal("hide");
+				toastr.success("移动部门成功", "成功提示");
+				initDepartmentTree();
+				
+				$("#edit-department-form")[0].reset();
+				$("#edit-department-form").data('bootstrapValidator').resetForm();
+				
+				setTimeout(function(){
+					var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+					var getAddedNode = deptTree.getNodeByParam("id", data.dept.id, null);
+					
+					deptTree.selectNode(getAddedNode);
+		            var currentNode = $("#" + getAddedNode.tId + "_a");
+		            currentNode.addClass("cur");
+		            
+					chosenDeptId = data.dept.id; //部门id
+					chosenDeptPid = getAddedNode.dept_pid; //部门pid
+					chosenDeptName = getAddedNode.dept_name; //部门name
+					chosenDeptDescription = getAddedNode.description; //部门描述
+					chosenNode = getAddedNode; //选择的节点
+					chosenDeptIdForAddTree = "";
+		            
+		            setDeptEditSubmitStatus();
+
+		     		$("#edit-department-name").val(data.dept.dept_name);
+					$("#edit-department-server").html('<option value="' + data.dept.nas_id +'">' + data.dept.nas_name + '</option>');
+		     		//$("#edit-department-sort").val(data.dept.weight);
+		     		var independent = Number(data.dept.independent);
+		     		if(independent == 1){
+		     			$("#edit-department-independent").prop("checked", true);
+		     		}else if(independent == 0){
+		     			$("#edit-department-independent").prop("checked", false);
+		     		}
+		     		$("#edit-department-describe").val(data.dept.description); 
+				}, 1000);
+			}else{
+				toastr.error(data.msg, "错误提示");
+			}
+		},
+		error: function(data){
+			toastr.error("连接失败", "错误提示");
+		}
+	});
+});
+
+/**
+ * 模块： 部门上移
+ */
+ 
+ $("#move-up-department").click(function(){
+	    if(chosenDeptId){
+	    	var params = JSON.stringify({"dept_id": chosenDeptId, "action": "move_up" });
+	    	console.log("上移时传给后台的参数：");
+	    	console.log(params);
+	    	
+	        $.ajax({
+	            type: "POST",
+	            url: '/kscd/api/dept/sort/',
+	            data: params,
+	            dataType: "json",
+	            success: function(data){
+					console.log("向上移动部门时后台返回的数据");
+					console.log(data);
+					if(data.ret){
+						initDepartmentTree();
+						
+						setTimeout(function(){
+							var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+							var getAddedNode = deptTree.getNodeByParam("id", chosenDeptId, null);
+							
+							deptTree.selectNode(getAddedNode);
+				            var currentNode = $("#" + getAddedNode.tId + "_a");
+				            currentNode.addClass("cur");
+
+						}, 1000);
+					}else{
+						toastr.error(data.msg, "错误提示");
+					}
+	            },
+	            error: function(data){
+	                toastr.error("连接失败", "错误提示");
+	            }
+	        });
+	    }else{
+	        toastr.error("请先选择需要上移的部门", "错误提示");
+	    }
+});
+	
+/**
+ * 模块： 部门下移
+ */
+
+$("#move-down-department").click(function(){
+	    if(chosenDeptId){
+	    	var params = JSON.stringify({"dept_id": chosenDeptId, "action": "move_down" });
+	    	console.log("下移时传给后台的参数：");
+	    	console.log(params);
+	    	
+	        $.ajax({
+	            type: "POST",
+	            url: '/kscd/api/dept/sort/',
+	            data: params,
+	            dataType: "json",
+	            success: function(data){
+					console.log("向下移动部门时后台返回的数据");
+					console.log(data);
+					if(data.ret){
+						initDepartmentTree();
+						
+						setTimeout(function(){
+							var deptTree = $.fn.zTree.getZTreeObj("department-tree");
+							var getAddedNode = deptTree.getNodeByParam("id", chosenDeptId, null);
+							
+							deptTree.selectNode(getAddedNode);
+				            var currentNode = $("#" + getAddedNode.tId + "_a");
+				            currentNode.addClass("cur");
+
+						}, 1000);
+					}else{
+						toastr.error(data.msg, "错误提示");
+					}
+	            },
+	            error: function(data){
+	                toastr.error("连接失败", "错误提示");
+	            }
+	        });
+	    }else{
+	        toastr.error("请先选择需要下移的部门", "错误提示");
+	    }
+});
+
+/**
+ * 模块：删除部门
+ */
+function delDepartment(){
+	if(chosenDeptId){
+		$.ajax({
+            type: "DELETE",
+            url: '/kscd/api/dept/' + chosenDeptId + '/',
+            data: {},
+            dataType: "json",
+            success: function(data){
+            	console.log("删除部门提交数据成功时后台返回的数据");
+				console.log(data);
+				if(data.ret){
+					toastr.success("删除部门" + chosenDeptName + "成功", "正确提示");
+                	initDepartmentTree();
+					$("#edit-department-form")[0].reset();
+					$("#edit-department-form").data('bootstrapValidator').resetForm();
+					chosenDeptId = "";
+					chosenDeptPid = "";
+					chosenDeptName = "";
+					chosenDeptDescription = "";
+					chosenNode = {};
+					setDeptEditSubmitStatus();
+				}else{
+					toastr.error(data.msg, "错误提示");
+				}
+            },
+            error: function(data){
+                toastr.error("连接失败", "错误提示");
+            }
+        });
+	}else{
+		toastr.error("请选择需要删除的部门", "错误提示");
+	}
+}
+
+/**
+ * 功能：清除表单验证
+ */
+function clearValidate(formId, treeId){
+	$("#" + formId)[0].reset();
+	$("#" + formId).data('bootstrapValidator').resetForm();
+    var treeObj = $.fn.zTree.getZTreeObj(treeId);
+    treeObj.checkAllNodes(false);
+    treeObj.cancelSelectedNode();
+}
+
+$(function() {
+    initDepartmentTree();
+	setDeptEditSubmitStatus();
+});
+</script>
+
+{% include "dist/common.html" %}
+{% include "dist/common-adm.html" %}
+</body>
+</html>
